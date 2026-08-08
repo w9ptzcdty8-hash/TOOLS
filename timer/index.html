@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>マルチタイマー＆プレゼンベル</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #000000;
+            color: #E0E0E0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        input[type="text"], input[type="number"] {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        header {
+            background-color: #121212;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: #FF9800;
+            border-bottom-color: #FF9800;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .tab-content {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+            padding: 15px;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .multi-timer-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .accordion-card {
+            background-color: #121212;
+            border-radius: 16px;
+            border: 1px solid #222;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-header {
+            width: 100%;
+            padding: 16px;
+            background-color: #1A1A1A;
+            color: #FF9800;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .accordion-icon {
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-card.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease-out, padding 0.35s ease-out;
+            padding: 0 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .accordion-card.open .accordion-body {
+            max-height: 380px;
+            padding: 15px;
+        }
+
+        .label-input {
+            width: 100%;
+            padding: 10px;
+            background-color: #1E1E1E;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #FFF;
+            font-size: 14px;
+        }
+
+        .label-input:focus {
+            outline: none;
+            border-color: #FF9800;
+        }
+
+        .wheel-picker-wrapper {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .wheel-selection-bar {
+            position: absolute;
+            top: 50%;
+            left: 8px;
+            right: 8px;
+            height: 40px;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .wheel-column-group {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            justify-content: space-evenly;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .wheel-column {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .wheel-container {
+            width: 55px;
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .wheel-list {
+            position: absolute;
+            width: 100%;
+            top: 60px;
+            left: 0;
+            list-style: none;
+        }
+
+        .wheel-item {
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 300;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .wheel-item.selected {
+            color: #FFF;
+            font-weight: bold;
+            font-size: 25px;
+        }
+
+        .wheel-unit {
+            font-size: 13px;
+            color: #FFF;
+            font-weight: bold;
+            margin-left: 2px;
+            pointer-events: none;
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #FF9800;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .add-btn:active {
+            opacity: 0.8;
+        }
+
+        .timers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .timer-card {
+            background-color: #121212;
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .timer-card-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-circle-wrapper {
+            position: relative;
+            width: 65px;
+            height: 65px;
+        }
+
+        .progress-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: #222;
+            stroke-width: 6;
+        }
+
+        .circle-bar {
+            fill: none;
+            stroke: #FF9800;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 188;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0.2s linear;
+        }
+
+        .timer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timer-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #AAA;
+        }
+
+        .timer-time-text {
+            font-size: 26px;
+            font-weight: 300;
+            font-variant-numeric: tabular-nums;
+            color: #FFF;
+        }
+
+        .timer-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sm-circle-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFF;
+        }
+
+        .btn-start { background-color: #2E7D32; color: #81C784; }
+        .btn-pause { background-color: #E65100; color: #FFB74D; }
+        .btn-reset { background-color: #222; color: #AAA; }
+        .btn-delete { background-color: transparent; color: #E57373; font-size: 16px; border: 1px solid #333; width: 30px; height: 30px; }
+
+        .presen-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .presen-timer-card {
+            background-color: #121212;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #222;
+        }
+
+        .presen-time-display {
+            font-size: 52px;
+            font-weight: bold;
+            color: #FFF;
+            font-variant-numeric: tabular-nums;
+            margin: 10px 0;
+        }
+
+        .bell-settings-card {
+            background-color: #121212;
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid #222;
+        }
+
+        .card-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 6px;
+        }
+
+        .bell-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .bell-row-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bell-tag {
+            background-color: #222;
+            color: #FFB74D;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 75px;
+            text-align: center;
+        }
+
+        .bell-time-inputs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mini-input {
+            width: 45px;
+            padding: 6px;
+            background-color: #1E1E1E;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #FFF;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333;
+            transition: .2s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: #4CAF50; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .manual-bell-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: #D84315;
+            color: #FFF;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(216, 67, 21, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .manual-bell-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .empty-msg {
+            text-align: center;
+            color: #555;
+            padding: 30px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="tab-btn active" onclick="switchTab('timer')">タイマー</button>
+        <button class="tab-btn" onclick="switchTab('presen')">プレゼン</button>
+    </header>
+
+    <main>
+        <div id="timer-tab" class="tab-content active">
+            <div class="multi-timer-container">
+                <div class="accordion-card" id="add-timer-accordion">
+                    <button class="accordion-header" onclick="toggleAccordion()">
+                        <span>＋ 新しいタイマーを設定</span>
+                        <span class="accordion-icon">▼</span>
+                    </button>
+                    <div class="accordion-body">
+                        <input type="text" id="new-timer-label" class="label-input" placeholder="タイマー名 (例: パスタ、筋トレ)">
+
+                        <div class="wheel-picker-wrapper">
+                            <div class="wheel-selection-bar"></div>
+                            <div class="wheel-column-group">
+                                <div class="wheel-column">
+                                    <div class="wheel-container" id="wheel-hours">
+                                        <ul class="wheel-list"></ul>
+                                    </div>
+                                    <span class="wheel-unit">時間</span>
+                                </div>
+                                <div class="wheel-column">
+                                    <div class="wheel-container" id="wheel-minutes">
+                                        <ul class="wheel-list"></ul>
+                                    </div>
+                                    <span class="wheel-unit">分</span>
+                                </div>
+                                <div class="wheel-column">
+                                    <div class="wheel-container" id="wheel-seconds">
+                                        <ul class="wheel-list"></ul>
+                                    </div>
+                                    <span class="wheel-unit">秒</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="add-btn" onclick="addNewTimer()">タイマーを追加</button>
+                    </div>
+                </div>
+
+                <div id="timers-list" class="timers-list"></div>
+            </div>
+        </div>
+
+        <div id="presen-tab" class="tab-content">
+            <div class="presen-container">
+                <div class="presen-timer-card">
+                    <div style="font-size: 12px; color: #888;">経過時間</div>
+                    <div id="presen-display" class="presen-time-display">00:00</div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                        <button id="presen-start-btn" class="add-btn" style="background-color: #2E7D32; color: #FFF; padding: 10px 24px;" onclick="togglePresenTimer()">スタート</button>
+                        <button class="add-btn" style="background-color: #333; color: #AAA; padding: 10px 24px;" onclick="resetPresenTimer()">リセット</button>
+                    </div>
+                </div>
+
+                <button class="manual-bell-btn" onclick="playRingBell(1)">
+                    🔔 手動でベルを鳴らす (チーン)
+                </button>
+
+                <div class="bell-settings-card">
+                    <div class="card-title">ベル鳴動設定</div>
+                    
+                    <div class="bell-row">
+                        <div class="bell-row-left">
+                            <span class="bell-tag">1回目 (予鈴)</span>
+                            <div class="bell-time-inputs">
+                                <input type="number" id="bell1-min" class="mini-input" value="7" onchange="savePresenSettings()"> 分
+                                <input type="number" id="bell1-sec" class="mini-input" value="0" onchange="savePresenSettings()"> 秒
+                            </div>
+                        </div>
+                        <span style="font-size: 12px; color: #4CAF50;">1回 (チーン)</span>
+                    </div>
+
+                    <div class="bell-row">
+                        <div class="bell-row-left">
+                            <span class="bell-tag">2回目 (終了)</span>
+                            <div class="bell-time-inputs">
+                                <input type="number" id="bell2-min" class="mini-input" value="10" onchange="savePresenSettings()"> 分
+                                <input type="number" id="bell2-sec" class="mini-input" value="0" onchange="savePresenSettings()"> 秒
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="bell2-enable" checked onchange="savePresenSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="bell-row">
+                        <div class="bell-row-left">
+                            <span class="bell-tag">3回目 (質疑)</span>
+                            <div class="bell-time-inputs">
+                                <input type="number" id="bell3-min" class="mini-input" value="15" onchange="savePresenSettings()"> 分
+                                <input type="number" id="bell3-sec" class="mini-input" value="0" onchange="savePresenSettings()"> 秒
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="bell3-enable" checked onchange="savePresenSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playRingBell(count = 1) {
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(2400, now);
+
+                    gain.gain.setValueAtTime(0.8, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    osc.start(now);
+                    osc.stop(now + 1.8);
+                }, i * 500);
+            }
+        }
+
+        function playAlarmSound() {
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(880, now);
+
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.setValueAtTime(0, now + 0.1);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                }, i * 150);
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabName === 'timer') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('timer-tab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('presen-tab').classList.add('active');
+            }
+        }
+
+        function toggleAccordion() {
+            const card = document.getElementById('add-timer-accordion');
+            card.classList.toggle('open');
+        }
+
+        class WheelPicker {
+            constructor(containerId, min, max, initialVal = 0, nameStr = "") {
+                this.container = document.getElementById(containerId);
+                this.list = this.container.querySelector('.wheel-list');
+                this.min = min;
+                this.max = max;
+                this.nameStr = nameStr;
+                this.itemHeight = 40;
+                this.selectedValue = initialVal;
+
+                this.currentY = 0;
+                this.startY = 0;
+                this.isDragging = false;
+                
+                this.lastY = 0;
+                this.lastTime = 0;
+                this.velocity = 0;
+                this.animId = null;
+
+                this.init();
+            }
+
+            init() {
+                this.list.innerHTML = '';
+                for (let i = this.min; i <= this.max; i++) {
+                    const li = document.createElement('li');
+                    li.className = 'wheel-item';
+                    li.textContent = i;
+                    
+                    // クリック/タップで数字の直接指定・入力（確実に反応するようpointerupまたはclickに設定）
+                    li.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.promptDirectInput(i);
+                    });
+                    
+                    this.list.appendChild(li);
+                }
+
+                this.setValue(this.selectedValue, false);
+
+                const el = this.container;
+                el.addEventListener('touchstart', (e) => this.onStart(e.touches[0].clientY), { passive: true });
+                window.addEventListener('touchmove', (e) => { if(this.isDragging) this.onMove(e.touches[0].clientY); }, { passive: true });
+                window.addEventListener('touchend', () => this.onEnd());
+
+                el.addEventListener('mousedown', (e) => this.onStart(e.clientY));
+                window.addEventListener('mousemove', (e) => { if(this.isDragging) this.onMove(e.clientY); });
+                window.addEventListener('mouseup', () => this.onEnd());
+            }
+
+            promptDirectInput(clickedVal) {
+                const input = prompt(`${this.nameStr}を入力してください (${this.min}〜${this.max}):`, clickedVal);
+                if (input !== null && input !== "") {
+                    const parsed = parseInt(input, 10);
+                    if (!isNaN(parsed)) {
+                        this.setValue(parsed, true);
+                    }
+                }
+            }
+
+            onStart(y) {
+                if (this.animId) cancelAnimationFrame(this.animId);
+                this.isDragging = true;
+                this.startY = y;
+                this.lastY = y;
+                this.lastTime = performance.now();
+                this.velocity = 0;
+            }
+
+            onMove(y) {
+                if (!this.isDragging) return;
+                const now = performance.now();
+                const deltaY = y - this.lastY;
+                const dt = now - this.lastTime;
+
+                if (dt > 0) {
+                    this.velocity = deltaY / dt;
+                }
+
+                this.currentY += deltaY;
+                this.lastY = y;
+                this.lastTime = now;
+
+                this.updatePosition();
+            }
+
+            onEnd() {
+                if (!this.isDragging) return;
+                this.isDragging = false;
+
+                const friction = 0.95;
+                const minVel = 0.05;
+
+                const animateInertia = () => {
+                    if (Math.abs(this.velocity) > minVel) {
+                        this.currentY += this.velocity * 16;
+                        this.velocity *= friction;
+
+                        const minY = -(this.max - this.min) * this.itemHeight;
+                        if (this.currentY > 0 || this.currentY < minY) {
+                            this.velocity *= 0.5;
+                        }
+
+                        this.updatePosition();
+                        this.animId = requestAnimationFrame(animateInertia);
+                    } else {
+                        this.snapToNearest();
+                    }
+                };
+
+                this.animId = requestAnimationFrame(animateInertia);
+            }
+
+            snapToNearest() {
+                const minY = -(this.max - this.min) * this.itemHeight;
+                const maxY = 0;
+                
+                let targetY = this.currentY;
+                if (targetY > maxY) targetY = maxY;
+                if (targetY < minY) targetY = minY;
+
+                let index = Math.round(-targetY / this.itemHeight);
+                this.setValue(this.min + index, true);
+            }
+
+            updatePosition() {
+                this.list.style.transform = `translateY(${this.currentY}px)`;
+                
+                let index = Math.round(-this.currentY / this.itemHeight);
+                const items = this.list.querySelectorAll('.wheel-item');
+                items.forEach((item, i) => {
+                    if (i === index) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+            }
+
+            setValue(val, animate = true) {
+                if (val < this.min) val = this.min;
+                if (val > this.max) val = this.max;
+                this.selectedValue = val;
+
+                const index = val - this.min;
+                this.currentY = -index * this.itemHeight;
+
+                if (animate) {
+                    this.list.style.transition = 'transform 0.2s ease-out';
+                    setTimeout(() => {
+                        this.list.style.transition = 'none';
+                    }, 200);
+                } else {
+                    this.list.style.transition = 'none';
+                }
+
+                this.updatePosition();
+            }
+
+            getValue() {
+                return this.selectedValue;
+            }
+        }
+
+        let pickerHours, pickerMinutes, pickerSeconds;
+
+        let timers = [
+            { id: 1, label: '3分タイマー', totalSec: 180, remainingSec: 180, isRunning: false, intervalId: null },
+            { id: 2, label: '6分タイマー', totalSec: 360, remainingSec: 360, isRunning: false, intervalId: null }
+        ];
+
+        function loadTimersFromStorage() {
+            const data = localStorage.getItem('multi_timers_v4_data');
+            if (data) {
+                try {
+                    const saved = JSON.parse(data);
+                    if (Array.isArray(saved) && saved.length > 0) {
+                        timers = saved.map(t => ({
+                            id: t.id,
+                            label: t.label,
+                            totalSec: t.totalSec,
+                            remainingSec: t.totalSec, // 再読み込み時は初期設定値にリセット、または一時停止状態として復元
+                            isRunning: false,
+                            intervalId: null
+                        }));
+                    }
+                } catch(e) {
+                    console.error('タイマーデータの読み込みエラー', e);
+                }
+            }
+        }
+
+        function saveTimersToStorage() {
+            const dataToSave = timers.map(t => ({
+                id: t.id,
+                label: t.label,
+                totalSec: t.totalSec,
+                remainingSec: t.totalSec
+            }));
+            localStorage.setItem('multi_timers_v4_data', JSON.stringify(dataToSave));
+        }
+
+        function renderTimers() {
+            const container = document.getElementById('timers-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (timers.length === 0) {
+                container.innerHTML = '<div class="empty-msg">タイマーを追加してください</div>';
+                return;
+            }
+
+            timers.forEach(t => {
+                const card = document.createElement('div');
+                card.className = 'timer-card';
+
+                const hrs = Math.floor(t.remainingSec / 3600);
+                const mins = Math.floor((t.remainingSec % 3600) / 60);
+                const secs = t.remainingSec % 60;
+
+                let timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                if (hrs > 0) {
+                    timeStr = `${hrs}:${timeStr}`;
+                }
+
+                const circleLength = 188;
+                const offset = t.totalSec > 0 ? circleLength - (t.remainingSec / t.totalSec) * circleLength : 0;
+
+                card.innerHTML = `
+                    <div class="timer-card-left">
+                        <div class="progress-circle-wrapper">
+                            <svg class="progress-svg" viewBox="0 0 70 70">
+                                <circle class="circle-bg" cx="35" cy="35" r="30"></circle>
+                                <circle class="circle-bar" cx="35" cy="35" r="30" style="stroke-dashoffset: ${offset};"></circle>
+                            </svg>
+                        </div>
+                        <div class="timer-info">
+                            <div class="timer-name">${escapeHtml(t.label || 'タイマー')}</div>
+                            <div class="timer-time-text">${timeStr}</div>
+                        </div>
+                    </div>
+                    <div class="timer-controls">
+                        <button class="sm-circle-btn ${t.isRunning ? 'btn-pause' : 'btn-start'}" onclick="toggleTimer(${t.id})">
+                            ${t.isRunning ? '一時停止' : 'スタート'}
+                        </button>
+                        <button class="sm-circle-btn btn-reset" onclick="resetTimer(${t.id})">リセット</button>
+                        <button class="sm-circle-btn btn-delete" onclick="deleteTimer(${t.id})">✕</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function addNewTimer() {
+            const labelInput = document.getElementById('new-timer-label');
+            const h = pickerHours ? pickerHours.getValue() : 0;
+            const m = pickerMinutes ? pickerMinutes.getValue() : 0;
+            const s = pickerSeconds ? pickerSeconds.getValue() : 0;
+
+            const totalSec = h * 3600 + m * 60 + s;
+            if (totalSec <= 0) return;
+
+            let defaultLabel = '';
+            if (h > 0) defaultLabel += `${h}時間`;
+            if (m > 0) defaultLabel += `${m}分`;
+            if (s > 0) defaultLabel += `${s}秒`;
+
+            const newTimer = {
+                id: Date.now(),
+                label: labelInput.value.trim() || `${defaultLabel}タイマー`,
+                totalSec: totalSec,
+                remainingSec: totalSec,
+                isRunning: false,
+                intervalId: null
+            };
+
+            timers.push(newTimer);
+            labelInput.value = '';
+            renderTimers();
+            saveTimersToStorage();
+
+            const card = document.getElementById('add-timer-accordion');
+            if (card) card.classList.remove('open');
+        }
+
+        function toggleTimer(id) {
+            initAudio();
+            const target = timers.find(t => t.id === id);
+            if (!target) return;
+
+            if (target.isRunning) {
+                clearInterval(target.intervalId);
+                target.isRunning = false;
+                renderTimers();
+            } else {
+                if (target.remainingSec <= 0) {
+                    target.remainingSec = target.totalSec;
+                }
+
+                target.isRunning = true;
+                renderTimers();
+
+                target.intervalId = setInterval(() => {
+                    target.remainingSec--;
+                    
+                    if (target.remainingSec <= 0) {
+                        clearInterval(target.intervalId);
+                        target.isRunning = false;
+                        playAlarmSound();
+                    }
+                    renderTimers();
+                }, 1000);
+            }
+        }
+
+        function resetTimer(id) {
+            const target = timers.find(t => t.id === id);
+            if (!target) return;
+
+            clearInterval(target.intervalId);
+            target.isRunning = false;
+            target.remainingSec = target.totalSec;
+            renderTimers();
+        }
+
+        function deleteTimer(id) {
+            const target = timers.find(t => t.id === id);
+            if (target) {
+                clearInterval(target.intervalId);
+            }
+            timers = timers.filter(t => t.id !== id);
+            renderTimers();
+            saveTimersToStorage();
+        }
+
+        let presenState = {
+            elapsedSec: 0,
+            isRunning: false,
+            intervalId: null,
+            rungBells: { bell1: false, bell2: false, bell3: false }
+        };
+
+        function renderPresen() {
+            const presenDisplay = document.getElementById('presen-display');
+            if (!presenDisplay) return;
+            const m = String(Math.floor(presenState.elapsedSec / 60)).padStart(2, '0');
+            const s = String(presenState.elapsedSec % 60).padStart(2, '0');
+            presenDisplay.textContent = `${m}:${s}`;
+        }
+
+        function togglePresenTimer() {
+            initAudio();
+            const presenStartBtn = document.getElementById('presen-start-btn');
+            if (presenState.isRunning) {
+                clearInterval(presenState.intervalId);
+                presenState.isRunning = false;
+                if (presenStartBtn) {
+                    presenStartBtn.textContent = '再開';
+                    presenStartBtn.style.backgroundColor = '#2E7D32';
+                }
+            } else {
+                presenState.isRunning = true;
+                if (presenStartBtn) {
+                    presenStartBtn.textContent = '一時停止';
+                    presenStartBtn.style.backgroundColor = '#E65100';
+                }
+
+                presenState.intervalId = setInterval(() => {
+                    presenState.elapsedSec++;
+                    renderPresen();
+                    checkPresenBells();
+                }, 1000);
+            }
+        }
+
+        function resetPresenTimer() {
+            const presenStartBtn = document.getElementById('presen-start-btn');
+            clearInterval(presenState.intervalId);
+            presenState.isRunning = false;
+            presenState.elapsedSec = 0;
+            presenState.rungBells = { bell1: false, bell2: false, bell3: false };
+            renderPresen();
+            if (presenStartBtn) {
+                presenStartBtn.textContent = 'スタート';
+                presenStartBtn.style.backgroundColor = '#2E7D32';
+            }
+        }
+
+        function checkPresenBells() {
+            const b1Sec = (parseInt(document.getElementById('bell1-min').value) || 0) * 60 + (parseInt(document.getElementById('bell1-sec').value) || 0);
+            const b2Sec = (parseInt(document.getElementById('bell2-min').value) || 0) * 60 + (parseInt(document.getElementById('bell2-sec').value) || 0);
+            const b3Sec = (parseInt(document.getElementById('bell3-min').value) || 0) * 60 + (parseInt(document.getElementById('bell3-sec').value) || 0);
+
+            const b2Enable = document.getElementById('bell2-enable').checked;
+            const b3Enable = document.getElementById('bell3-enable').checked;
+
+            if (!presenState.rungBells.bell1 && presenState.elapsedSec === b1Sec) {
+                playRingBell(1);
+                presenState.rungBells.bell1 = true;
+            }
+
+            if (b2Enable && !presenState.rungBells.bell2 && presenState.elapsedSec === b2Sec) {
+                playRingBell(2);
+                presenState.rungBells.bell2 = true;
+            }
+
+            if (b3Enable && !presenState.rungBells.bell3 && presenState.elapsedSec === b3Sec) {
+                playRingBell(3);
+                presenState.rungBells.bell3 = true;
+            }
+        }
+
+        function savePresenSettings() {
+            const settings = {
+                b1m: document.getElementById('bell1-min').value,
+                b1s: document.getElementById('bell1-sec').value,
+                b2m: document.getElementById('bell2-min').value,
+                b2s: document.getElementById('bell2-sec').value,
+                b2e: document.getElementById('bell2-enable').checked,
+                b3m: document.getElementById('bell3-min').value,
+                b3s: document.getElementById('bell3-sec').value,
+                b3e: document.getElementById('bell3-enable').checked,
+            };
+            localStorage.setItem('presen_bell_settings', JSON.stringify(settings));
+        }
+
+        function loadPresenSettings() {
+            const data = localStorage.getItem('presen_bell_settings');
+            if (data) {
+                try {
+                    const s = JSON.parse(data);
+                    document.getElementById('bell1-min').value = s.b1m ?? 7;
+                    document.getElementById('bell1-sec').value = s.b1s ?? 0;
+                    document.getElementById('bell2-min').value = s.b2m ?? 10;
+                    document.getElementById('bell2-sec').value = s.b2s ?? 0;
+                    document.getElementById('bell2-enable').checked = s.b2e ?? true;
+                    document.getElementById('bell3-min').value = s.b3m ?? 15;
+                    document.getElementById('bell3-sec').value = s.b3s ?? 0;
+                    document.getElementById('bell3-enable').checked = s.b3e ?? true;
+                } catch(e) {}
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        window.onload = function() {
+            pickerHours = new WheelPicker('wheel-hours', 0, 23, 0, '時間');
+            pickerMinutes = new WheelPicker('wheel-minutes', 0, 59, 5, '分');
+            pickerSeconds = new WheelPicker('wheel-seconds', 0, 59, 0, '秒');
+
+            loadTimersFromStorage();
+            loadPresenSettings();
+            renderTimers();
+            renderPresen();
+        };
+    </script>
+</body>
+</html>
+
