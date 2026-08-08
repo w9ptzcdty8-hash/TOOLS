@@ -167,6 +167,9 @@
         .custom-table-wrapper {
             width: 100%;
             overflow-x: auto;
+            background-color: #1A1A1A;
+            border-radius: 8px;
+            border: 1px solid #2A2A2A;
         }
 
         .custom-table {
@@ -177,7 +180,7 @@
         }
 
         .custom-table th, .custom-table td {
-            padding: 10px 8px;
+            padding: 10px 10px;
             border-bottom: 1px solid #2A2A2A;
             white-space: nowrap;
         }
@@ -188,6 +191,7 @@
             font-weight: normal;
             position: sticky;
             top: 0;
+            z-index: 1;
         }
 
         .custom-table td.val-cell {
@@ -197,8 +201,9 @@
         }
 
         .custom-table td.no-cell {
-            color: #888;
-            width: 40px;
+            color: #4CAF50;
+            font-weight: bold;
+            width: 45px;
         }
 
         .table-label-input {
@@ -341,7 +346,7 @@
         .sm-btn-minus { background-color: #C62828; }
         .sm-btn-reset { background-color: #424242; font-size: 11px; color: #AAA; }
 
-        /* 保存履歴テーブルスタイル */
+        /* 保存履歴エリア */
         .history-board-section {
             margin-top: 10px;
             background-color: #1A1A1A;
@@ -364,7 +369,7 @@
         }
 
         .history-table {
-            min-width: 100%;
+            width: 100%;
         }
 
         .history-table th, .history-table td {
@@ -373,15 +378,13 @@
 
         .history-table th.time-col, .history-table td.time-col {
             text-align: left;
-            position: sticky;
-            left: 0;
-            background-color: #1E1E1E;
-            z-index: 1;
         }
 
-        .history-table td.total-col {
+        .history-table tfoot td {
+            background-color: #242424;
             font-weight: bold;
             color: #FFB74D;
+            border-top: 2px solid #444;
         }
 
         .empty-msg {
@@ -418,7 +421,7 @@
 
                 <div class="history-section">
                     <div class="history-header">
-                        <span class="history-title">保存履歴 (No / 日時 / ラベル / カウント)</span>
+                        <span class="history-title">保存履歴</span>
                         <button class="clear-history-btn" onclick="clearSingleHistory()">全削除</button>
                     </div>
                     <div class="custom-table-wrapper">
@@ -445,7 +448,7 @@
             <div class="multi-container">
                 <div class="multi-controls">
                     <button class="add-counter-btn" onclick="addMultiCounter()">＋ カウンター追加</button>
-                    <button class="save-score-btn" onclick="saveMultiHistory()">状態を一覧に保存</button>
+                    <button class="save-score-btn" onclick="saveMultiHistory()">保存</button>
                 </div>
 
                 <div id="multi-list" class="multi-list">
@@ -455,7 +458,7 @@
                 <!-- 保存履歴一覧エリア -->
                 <div class="history-board-section">
                     <div class="history-board-header">
-                        <span class="history-board-title">保存履歴一覧</span>
+                        <span class="history-board-title">保存履歴</span>
                         <button class="clear-history-btn" onclick="clearMultiHistory()">履歴クリア</button>
                     </div>
                     <div class="custom-table-wrapper">
@@ -466,6 +469,9 @@
                             <tbody id="history-table-body">
                                 <!-- JavaScriptで動的に挿入されます -->
                             </tbody>
+                            <tfoot id="history-table-foot">
+                                <!-- 各項目ごとの合計が動的に挿入されます -->
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -482,7 +488,7 @@
                 { id: 1, label: '項目 1', count: 0 },
                 { id: 2, label: '項目 2', count: 0 }
             ],
-            multiHistory: [] // { timestamp, scores: { label: count }, total: sum }
+            multiHistory: [] // [ { id, no, timestamp, scores: { [id]: count } } ]
         };
 
         // 初期化処理（ページ読み込み時）
@@ -495,11 +501,11 @@
 
         /* --- ローカルストレージ処理 --- */
         function saveToLocalStorage() {
-            localStorage.setItem('mobile_counter_v3_data', JSON.stringify(state));
+            localStorage.setItem('mobile_counter_v6_data', JSON.stringify(state));
         }
 
         function loadFromLocalStorage() {
-            const data = localStorage.getItem('mobile_counter_v3_data');
+            const data = localStorage.getItem('mobile_counter_v6_data');
             if (data) {
                 try {
                     state = JSON.parse(data);
@@ -535,8 +541,8 @@
                 return;
             }
 
-            // 降順（最新が上）で表示
-            state.singleHistory.slice().reverse().forEach(item => {
+            // 昇順（古い順：#1が一番上で下に向かって追加）で表示
+            state.singleHistory.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="no-cell">#${item.no}</td>
@@ -636,12 +642,14 @@
                 count: 0
             });
             renderMulti();
+            renderMultiHistory();
             saveToLocalStorage();
         }
 
         function removeMultiCounter(id) {
             state.multiCounters = state.multiCounters.filter(item => item.id !== id);
             renderMulti();
+            renderMultiHistory();
             saveToLocalStorage();
         }
 
@@ -667,11 +675,12 @@
             const target = state.multiCounters.find(item => item.id === id);
             if (target) {
                 target.label = newLabel;
+                renderMultiHistory();
                 saveToLocalStorage();
             }
         }
 
-        /* --- マルチ保存履歴テーブル描画処理 --- */
+        /* --- マルチ保存履歴テーブル（縦型構造） --- */
         function saveMultiHistory() {
             if (state.multiCounters.length === 0) return;
 
@@ -679,18 +688,19 @@
             const timeStr = `${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
             const scoresObj = {};
-            let total = 0;
 
-            // 現在存在するカウンターのラベルと数値を記録
+            // 現在のカウンター値を各IDごとにスナップショット保存
             state.multiCounters.forEach(c => {
-                scoresObj[c.label] = c.count;
-                total += c.count;
+                scoresObj[c.id] = c.count;
             });
 
+            const nextNo = state.multiHistory.length + 1;
+
             state.multiHistory.push({
+                id: Date.now(),
+                no: nextNo,
                 timestamp: timeStr,
-                scores: scoresObj,
-                total: total
+                scores: scoresObj
             });
 
             renderMultiHistory();
@@ -700,47 +710,70 @@
         function renderMultiHistory() {
             const thead = document.getElementById('history-table-head');
             const tbody = document.getElementById('history-table-body');
+            const tfoot = document.getElementById('history-table-foot');
+            
             thead.innerHTML = '';
             tbody.innerHTML = '';
+            tfoot.innerHTML = '';
 
-            if (state.multiHistory.length === 0) {
-                tbody.innerHTML = '<tr><td class="empty-msg">保存された履歴はありません</td></tr>';
+            if (state.multiCounters.length === 0) {
+                tbody.innerHTML = '<tr><td class="empty-msg">カウンター項目がありません</td></tr>';
                 return;
             }
 
-            // テーブルヘッダーの生成（ユニークな全ての項目名を収集）
-            const allLabels = [];
-            state.multiHistory.forEach(h => {
-                Object.keys(h.scores).forEach(lbl => {
-                    if (!allLabels.includes(lbl)) {
-                        allLabels.push(lbl);
-                    }
-                });
-            });
+            if (state.multiHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="' + (state.multiCounters.length + 2) + '" class="empty-msg">保存された履歴はありません</td></tr>';
+                return;
+            }
 
+            // 1. ヘッダーの生成 (No. / 日時 / [各項目名...])
             let trHead = document.createElement('tr');
-            let headHTML = `<th class="time-col">日時</th>`;
-            allLabels.forEach(lbl => {
-                headHTML += `<th>${escapeHtml(lbl)}</th>`;
+            let headHTML = `
+                <th style="width:45px;">No.</th>
+                <th class="time-col">日時</th>
+            `;
+            state.multiCounters.forEach(c => {
+                headHTML += `<th>${escapeHtml(c.label)}</th>`;
             });
-            headHTML += `<th style="color:#FFB74D;">合計</th>`;
             trHead.innerHTML = headHTML;
             thead.appendChild(trHead);
 
-            // 履歴行の生成 (古い順に上から下へ追加)
+            // 各項目ごとの合計計算用のオブジェクト
+            const columnTotals = {};
+            state.multiCounters.forEach(c => {
+                columnTotals[c.id] = 0;
+            });
+
+            // 2. 履歴データ行の生成（昇順：古い順に上から表示）
             state.multiHistory.forEach(h => {
                 let tr = document.createElement('tr');
-                let rowHTML = `<td class="time-col" style="color:#AAA;">${h.timestamp}</td>`;
-                
-                allLabels.forEach(lbl => {
-                    const val = (h.scores[lbl] !== undefined) ? h.scores[lbl] : '-';
+                let rowHTML = `
+                    <td class="no-cell">#${h.no}</td>
+                    <td class="time-col" style="color:#AAA;">${h.timestamp}</td>
+                `;
+
+                state.multiCounters.forEach(c => {
+                    const val = (h.scores[c.id] !== undefined) ? h.scores[c.id] : '-';
+                    if (typeof val === 'number') {
+                        columnTotals[c.id] += val;
+                    }
                     rowHTML += `<td>${val}</td>`;
                 });
 
-                rowHTML += `<td class="total-col">${h.total}</td>`;
                 tr.innerHTML = rowHTML;
                 tbody.appendChild(tr);
             });
+
+            // 3. フッター（一番下の各項目ごとの合計行）の生成
+            let trFoot = document.createElement('tr');
+            let footHTML = `
+                <td colspan="2" style="text-align:right;">合計</td>
+            `;
+            state.multiCounters.forEach(c => {
+                footHTML += `<td>${columnTotals[c.id]}</td>`;
+            });
+            trFoot.innerHTML = footHTML;
+            tfoot.appendChild(trFoot);
         }
 
         function clearMultiHistory() {
