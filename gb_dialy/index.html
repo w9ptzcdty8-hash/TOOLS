@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>G & B Diary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="app-header">
+    <h1 class="logo">G <span class="amp">&amp;</span> B <span class="logo-diary">Diary</span></h1>
+  </header>
+
+  <main class="tab-content">
+
+    <!-- ============ 書く ============ -->
+    <section id="tab-write" class="tab-panel is-active">
+      <p class="panel-lead">今日はどんな一日でしたか？</p>
+
+      <div class="mood-select" id="writeMoodSelect">
+        <button type="button" class="mood-btn mood-good" data-mood="good">
+          <span class="mood-btn-label">GOOD</span>
+          <span class="mood-btn-sub">いいこと</span>
+        </button>
+        <button type="button" class="mood-btn mood-bad" data-mood="bad">
+          <span class="mood-btn-label">BAD</span>
+          <span class="mood-btn-sub">よくないこと</span>
+        </button>
+        <button type="button" class="mood-btn mood-flat" data-mood="flat">
+          <span class="mood-btn-label">FLAT</span>
+          <span class="mood-btn-sub">どちらでもない</span>
+        </button>
+      </div>
+
+      <div class="write-form" id="writeForm" hidden>
+        <div class="selected-mood-chip" id="selectedMoodChip"></div>
+        <textarea id="diaryText" class="diary-textarea" maxlength="140" placeholder="短く、今日のことをひとこと…"></textarea>
+        <div class="char-count"><span id="charCount">0</span> / 140</div>
+        <div class="write-actions">
+          <button type="button" id="writeCancelBtn" class="secondary-btn">選び直す</button>
+          <button type="button" id="saveBtn" class="primary-btn" disabled>保存する</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 読む ============ -->
+    <section id="tab-read" class="tab-panel">
+      <div class="filter-bar" id="filterBar">
+        <button type="button" class="filter-btn is-active" data-filter="good">GOOD</button>
+        <button type="button" class="filter-btn" data-filter="bad">BAD</button>
+        <button type="button" class="filter-btn" data-filter="flat">FLAT</button>
+        <button type="button" class="filter-btn" data-filter="all">すべて</button>
+      </div>
+
+      <div id="entryList" class="entry-list"></div>
+      <p id="emptyState" class="empty-state" hidden>まだ日記がありません</p>
+    </section>
+
+    <!-- ============ 見る ============ -->
+    <section id="tab-view" class="tab-panel">
+
+      <div class="calendar-block">
+        <div class="calendar-header">
+          <button type="button" id="prevMonth" class="month-nav" aria-label="前の月">‹</button>
+          <span id="calendarMonthLabel" class="calendar-month-label"></span>
+          <button type="button" id="nextMonth" class="month-nav" aria-label="次の月">›</button>
+        </div>
+
+        <div class="calendar-weekdays">
+          <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+        </div>
+
+        <div id="calendarGrid" class="calendar-grid"></div>
+      </div>
+
+      <div id="calendarDayEntries" class="calendar-day-entries" hidden>
+        <div class="calendar-day-entries-header">
+          <span id="calendarDaySelectedLabel"></span>
+          <button type="button" id="calendarDayClose" class="text-btn">閉じる</button>
+        </div>
+        <div id="calendarDayList" class="calendar-day-list"></div>
+      </div>
+
+      <div class="graph-block">
+        <div class="graph-header">
+          <h2 class="graph-title">今年のGOOD件数</h2>
+          <span id="graphYearLabel" class="graph-year"></span>
+        </div>
+        <div id="barGraph" class="bar-graph"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <nav class="tab-bar">
+    <button type="button" class="tab-btn is-active" data-tab="write">
+      <span class="tab-icon">✍️</span><span class="tab-label">書く</span>
+    </button>
+    <button type="button" class="tab-btn" data-tab="read">
+      <span class="tab-icon">📖</span><span class="tab-label">読む</span>
+    </button>
+    <button type="button" class="tab-btn" data-tab="view">
+      <span class="tab-icon">📊</span><span class="tab-label">見る</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- 編集モーダル -->
+<div id="editModal" class="modal-overlay" hidden>
+  <div class="modal-card">
+    <h3 class="modal-title">日記を編集</h3>
+    <div class="mood-select mood-select-modal" id="editMoodSelect">
+      <button type="button" class="mood-btn mood-good" data-mood="good">
+        <span class="mood-btn-label">GOOD</span>
+      </button>
+      <button type="button" class="mood-btn mood-bad" data-mood="bad">
+        <span class="mood-btn-label">BAD</span>
+      </button>
+      <button type="button" class="mood-btn mood-flat" data-mood="flat">
+        <span class="mood-btn-label">FLAT</span>
+      </button>
+    </div>
+    <textarea id="editText" class="diary-textarea" maxlength="140"></textarea>
+    <div class="char-count"><span id="editCharCount">0</span> / 140</div>
+    <div class="modal-actions">
+      <button type="button" id="editCancelBtn" class="secondary-btn">キャンセル</button>
+      <button type="button" id="editSaveBtn" class="primary-btn">更新する</button>
+    </div>
+  </div>
+</div>
+
+<!-- トースト通知 -->
+<div id="toast" class="toast" hidden></div>
+
+<script src="script.js"></script>
+</body>
+</html>
