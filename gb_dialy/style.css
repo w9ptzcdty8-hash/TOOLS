@@ -1,0 +1,681 @@
+/* =========================================================
+   G & B Diary - style.css
+   シンプル・ミニマル(白基調) デザイン
+   ========================================================= */
+
+:root {
+  --bg: #faf9f5;
+  --surface: #ffffff;
+  --ink: #2b2b26;
+  --ink-soft: #7a786f;
+  --border: #e8e5db;
+
+  --good: #5f8a68;
+  --good-bg: #e7f0e5;
+  --good-strong: #4b7154;
+
+  --bad: #6f7f92;
+  --bad-bg: #e9edf2;
+  --bad-strong: #56657a;
+
+  --flat: #b28a55;
+  --flat-bg: #f3ead9;
+  --flat-strong: #916f3f;
+
+  --dot-pink: #ea8fa6;
+
+  --radius-s: 10px;
+  --radius-m: 16px;
+  --radius-l: 22px;
+
+  --shadow-1: 0 2px 8px rgba(43, 43, 38, 0.06);
+  --shadow-2: 0 8px 24px rgba(43, 43, 38, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
+}
+
+textarea, input {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+button {
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ---------- ヘッダー ---------- */
+.app-header {
+  padding: 20px 20px 12px;
+  text-align: center;
+}
+
+.logo {
+  margin: 0;
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+.logo .amp {
+  color: var(--dot-pink);
+  font-weight: 500;
+}
+
+.logo-diary {
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+/* ---------- タブコンテンツ ---------- */
+.tab-content {
+  flex: 1;
+  padding: 4px 20px 100px;
+}
+
+.tab-panel {
+  display: none;
+  animation: fadeIn 0.18s ease;
+}
+
+.tab-panel.is-active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-lead {
+  margin: 12px 4px 18px;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+/* ---------- 気分選択ボタン（書く） ---------- */
+.mood-select {
+  display: flex;
+  gap: 10px;
+}
+
+.mood-btn {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-m);
+  padding: 18px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.mood-btn:active {
+  transform: scale(0.96);
+}
+
+.mood-btn-label {
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.mood-btn-sub {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.mood-btn.mood-good .mood-btn-label { color: var(--good-strong); }
+.mood-btn.mood-bad .mood-btn-label { color: var(--bad-strong); }
+.mood-btn.mood-flat .mood-btn-label { color: var(--flat-strong); }
+
+.mood-btn.mood-good.is-selected { background: var(--good-bg); border-color: var(--good); }
+.mood-btn.mood-bad.is-selected { background: var(--bad-bg); border-color: var(--bad); }
+.mood-btn.mood-flat.is-selected { background: var(--flat-bg); border-color: var(--flat); }
+
+/* ---------- 書くフォーム ---------- */
+.write-form {
+  margin-top: 20px;
+}
+
+.selected-mood-chip {
+  display: inline-block;
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+
+.selected-mood-chip.mood-good { background: var(--good-bg); color: var(--good-strong); }
+.selected-mood-chip.mood-bad { background: var(--bad-bg); color: var(--bad-strong); }
+.selected-mood-chip.mood-flat { background: var(--flat-bg); color: var(--flat-strong); }
+
+.diary-textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: none;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  padding: 14px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+  font-family: inherit;
+}
+
+.diary-textarea:focus {
+  outline: none;
+  border-color: var(--ink-soft);
+}
+
+.char-count {
+  text-align: right;
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-top: 6px;
+}
+
+.write-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.primary-btn {
+  flex: 1;
+  border: none;
+  border-radius: var(--radius-m);
+  background: var(--ink);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 15px;
+  cursor: pointer;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.primary-btn:active {
+  transform: scale(0.97);
+}
+
+.primary-btn:disabled {
+  opacity: 0.35;
+}
+
+.secondary-btn {
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-soft);
+  border-radius: var(--radius-m);
+  font-size: 14px;
+  padding: 15px 16px;
+  cursor: pointer;
+}
+
+.text-btn {
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  font-size: 13px;
+  padding: 6px;
+  cursor: pointer;
+}
+
+/* ---------- 読む：フィルター ---------- */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0 18px;
+  overflow-x: auto;
+}
+
+.filter-btn {
+  flex-shrink: 0;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.filter-btn.is-active[data-filter="good"] { background: var(--good); border-color: var(--good); color: #fff; }
+.filter-btn.is-active[data-filter="bad"] { background: var(--bad); border-color: var(--bad); color: #fff; }
+.filter-btn.is-active[data-filter="flat"] { background: var(--flat); border-color: var(--flat); color: #fff; }
+.filter-btn.is-active[data-filter="all"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+/* ---------- 読む：日記一覧 ---------- */
+.entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.entry-date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entry-date-heading {
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  padding-left: 2px;
+}
+
+.entry-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: 14px;
+  box-shadow: var(--shadow-1);
+}
+
+.entry-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.entry-tag {
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.entry-tag.mood-good { background: var(--good-bg); color: var(--good-strong); }
+.entry-tag.mood-bad { background: var(--bad-bg); color: var(--bad-strong); }
+.entry-tag.mood-flat { background: var(--flat-bg); color: var(--flat-strong); }
+
+.entry-time {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.entry-text {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.entry-card-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
+
+.icon-btn {
+  border: none;
+  background: var(--bg);
+  color: var(--ink-soft);
+  border-radius: var(--radius-s);
+  font-size: 12px;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.icon-btn.danger {
+  color: #b0524f;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin-top: 60px;
+}
+
+/* ---------- 見る：カレンダー ---------- */
+.calendar-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  padding: 16px;
+  margin-top: 14px;
+  box-shadow: var(--shadow-1);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.calendar-month-label {
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.month-nav {
+  border: none;
+  background: var(--bg);
+  color: var(--ink);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+}
+
+.calendar-weekdays span {
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-soft);
+  padding-bottom: 4px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 13px;
+  background: none;
+  border: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.calendar-day.is-empty {
+  visibility: hidden;
+  cursor: default;
+}
+
+.calendar-day.is-today {
+  border: 1.5px solid var(--ink-soft);
+}
+
+.calendar-day.is-selected {
+  background: var(--ink);
+  color: #fff;
+}
+
+.calendar-day-dot {
+  position: absolute;
+  bottom: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--dot-pink);
+}
+
+.calendar-day.is-selected .calendar-day-dot {
+  background: #fff;
+}
+
+.calendar-day-entries {
+  background: var(--good-bg);
+  border-radius: var(--radius-m);
+  padding: 14px;
+  margin-top: 12px;
+}
+
+.calendar-day-entries-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--good-strong);
+}
+
+.calendar-day-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calendar-day-list .entry-text-only {
+  background: var(--surface);
+  border-radius: var(--radius-s);
+  padding: 10px 12px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.calendar-day-empty {
+  font-size: 13px;
+  color: var(--good-strong);
+  opacity: 0.7;
+}
+
+/* ---------- 見る：棒グラフ ---------- */
+.graph-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  padding: 16px;
+  margin-top: 14px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-1);
+}
+
+.graph-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.graph-title {
+  margin: 0;
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.graph-year {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.bar-graph {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 140px;
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 4px;
+}
+
+.bar-value {
+  font-size: 10px;
+  color: var(--good-strong);
+  font-weight: 700;
+  min-height: 12px;
+}
+
+.bar-fill {
+  width: 70%;
+  background: var(--good);
+  border-radius: 4px 4px 2px 2px;
+  min-height: 3px;
+  transition: height 0.3s ease;
+}
+
+.bar-col.is-current-month .bar-fill {
+  background: var(--dot-pink);
+}
+
+.bar-label {
+  font-size: 9.5px;
+  color: var(--ink-soft);
+}
+
+/* ---------- タブバー ---------- */
+.tab-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 6px 10px calc(6px + env(safe-area-inset-bottom));
+  box-shadow: 0 -2px 10px rgba(43, 43, 38, 0.05);
+}
+
+.tab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border: none;
+  background: none;
+  padding: 8px 0;
+  border-radius: var(--radius-s);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.tab-btn.is-active {
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.tab-icon {
+  font-size: 18px;
+}
+
+.tab-label {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* ---------- モーダル ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 43, 38, 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  padding: 22px 20px calc(20px + env(safe-area-inset-bottom));
+  box-shadow: var(--shadow-2);
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-title {
+  margin: 0 0 14px;
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-size: 16px;
+}
+
+.mood-select-modal .mood-btn {
+  padding: 12px 6px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* ---------- トースト ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  z-index: 60;
+  box-shadow: var(--shadow-2);
+  animation: toastIn 0.2s ease;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
