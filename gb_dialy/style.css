@@ -628,6 +628,10 @@ button {
   z-index: 50;
 }
 
+.modal-overlay[hidden] {
+  display: none;
+}
+
 .modal-card {
   width: 100%;
   max-width: 480px;
