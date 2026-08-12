@@ -290,4 +290,14 @@ textarea:focus {
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    padding: 2px 0;
+}
+
+/* admaxスクリプトが生成する要素（iframe/table/div等）を画面幅に収める設定 */
+.fixed-ad-container iframe,
+.fixed-ad-container table,
+.fixed-ad-container div,
+.fixed-ad-container ins {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
 }
