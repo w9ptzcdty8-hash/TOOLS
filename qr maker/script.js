@@ -46,29 +46,37 @@ document.addEventListener("DOMContentLoaded", () => {
         addHistory(text);
     });
 
-    // 「画像ダウンロード」ボタンを押したとき
+    // 「画像ダウンロード」ボタンを押したとき（修正版）
     downloadBtn.addEventListener("click", () => {
-        const img = qrcodeBox.querySelector("img");
         const canvas = qrcodeBox.querySelector("canvas");
+        const img = qrcodeBox.querySelector("img");
 
-        let imageSrc = "";
-        if (img && img.src) {
-            imageSrc = img.src;
-        } else if (canvas) {
-            imageSrc = canvas.toDataURL("image/png");
-        }
-
-        if (!imageSrc) {
-            alert("画像の取得に失敗しました。");
+        // 1. Canvas要素が存在する場合（Blobに変換してダウンロード）
+        if (canvas) {
+            try {
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        executeDownload(blob);
+                    } else {
+                        fallbackDownload(canvas.toDataURL("image/png"));
+                    }
+                }, "image/png");
+            } catch (e) {
+                fallbackDownload(canvas.toDataURL("image/png"));
+            }
             return;
         }
 
-        const link = document.createElement("a");
-        link.href = imageSrc;
-        link.download = "qrcode.png";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // 2. img要素が存在する場合
+        if (img && img.src) {
+            fetch(img.src)
+                .then(res => res.blob())
+                .then(blob => executeDownload(blob))
+                .catch(() => fallbackDownload(img.src));
+            return;
+        }
+
+        alert("QRコード画像の取得に失敗しました。再度作成してください。");
     });
 
     // モーダルの開閉処理
@@ -105,10 +113,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ------------------------------------------
+    // ダウンロード実行・フォールバック処理
+    // ------------------------------------------
+    function executeDownload(blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "qrcode.png";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // メモリ解放
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }
+
+    function fallbackDownload(dataUrl) {
+        // 自動ダウンロードが拒否された場合、新しいタブで画像を開いて長押し保存を促す
+        const newWindow = window.open();
+        if (newWindow) {
+            newWindow.document.write(`<img src="${dataUrl}" alt="QR Code"><p>画像を長押しして保存してください。</p>`);
+        } else {
+            alert("ダウンロードがブロックされました。QRコード画像を長押しして保存してください。");
+        }
+    }
+
+    // ------------------------------------------
     // データ管理（LocalStorage）
     // ------------------------------------------
     function addHistory(text) {
-        // 重複があれば一旦除去して先頭に追加（最新順）
         historyData = historyData.filter(item => item !== text);
         historyData.unshift(text);
 
@@ -148,12 +181,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // リスト描画処理
     // ------------------------------------------
     function renderLists() {
-        // 履歴の描画（直近5件 & 全件モーダル）
         renderItemList(historyList, historyData.slice(0, DISPLAY_LIMIT), "history");
         renderItemList(modalHistoryList, historyData, "history");
         showAllHistoryBtn.style.display = historyData.length > DISPLAY_LIMIT ? "block" : "none";
 
-        // お気に入りの描画（直近5件 & 全件モーダル）
         renderItemList(favList, favData.slice(0, DISPLAY_LIMIT), "fav");
         renderItemList(modalFavList, favData, "fav");
         showAllFavBtn.style.display = favData.length > DISPLAY_LIMIT ? "block" : "none";
@@ -174,7 +205,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const li = document.createElement("li");
             li.className = "item-row";
 
-            // テキスト表示部分（タップで再生成）
             const textSpan = document.createElement("span");
             textSpan.className = "item-text";
             textSpan.textContent = text;
@@ -186,11 +216,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 closeModal(favModal);
             });
 
-            // ボタンエリア
             const actionDiv = document.createElement("div");
             actionDiv.className = "item-actions";
 
-            // ★ お気に入りボタン
             const favBtn = document.createElement("button");
             const isFav = favData.includes(text);
             favBtn.className = `action-icon-btn ${isFav ? "active" : ""}`;
@@ -201,7 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 toggleFav(text);
             });
 
-            // ✕ 削除ボタン
             const delBtn = document.createElement("button");
             delBtn.className = "action-icon-btn delete";
             delBtn.innerHTML = "✕";
