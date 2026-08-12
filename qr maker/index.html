@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <!-- スマホでの拡大ズーム等を制限するViewport設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QR MAKER</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Lightweight QR Code generator library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+    <header class="header">
+        <h1>QR MAKER</h1>
+    </header>
+
+    <main class="container">
+        <!-- テキスト入力エリア -->
+        <section class="card">
+            <label for="qr-input" class="label">テキスト / URLを入力</label>
+            <textarea id="qr-input" rows="3" placeholder="https://example.com や テキストを入力"></textarea>
+            <button id="generate-btn" class="btn btn-primary">QRコード作成</button>
+        </section>
+
+        <!-- QRコード結果表示エリア -->
+        <section id="result-section" class="card result-card" style="display: none;">
+            <div id="qrcode-box"></div>
+            <button id="download-btn" class="btn btn-secondary">画像ダウンロード (PNG)</button>
+        </section>
+
+        <!-- 履歴エリア -->
+        <section class="card">
+            <h2>履歴</h2>
+            <ul id="history-list" class="item-list"></ul>
+            <button id="show-all-history-btn" class="btn btn-outline" style="display: none;">すべての履歴を見る</button>
+        </section>
+
+        <!-- お気に入りエリア -->
+        <section class="card">
+            <h2>お気に入り</h2>
+            <ul id="fav-list" class="item-list"></ul>
+            <button id="show-all-fav-btn" class="btn btn-outline" style="display: none;">すべてのお気に入りを表示</button>
+        </section>
+    </main>
+
+    <!-- 履歴全件モーダル -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>すべての履歴</h3>
+                <button class="close-btn" id="close-history-modal">&times;</button>
+            </div>
+            <ul id="modal-history-list" class="item-list modal-list"></ul>
+        </div>
+    </div>
+
+    <!-- お気に入り全件モーダル -->
+    <div id="fav-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>すべてのお気に入り</h3>
+                <button class="close-btn" id="close-fav-modal">&times;</button>
+            </div>
+            <ul id="modal-fav-list" class="item-list modal-list"></ul>
+        </div>
+    </div>
+
+    <!-- 画面下部 固定広告エリア -->
+    <div class="fixed-ad-container">
+        <!-- admax -->
+        <script src="https://adm.shinobi.jp/s/1596a166ea799d6e2c02f5a97ee144c2"></script>
+        <!-- admax -->
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
