@@ -274,7 +274,7 @@ textarea:focus {
 }
 
 /* ==========================================
-   画面下部 固定広告エリア
+   画面下部 固定広告エリア（位置ズレ・はみ出し修正版）
    ========================================== */
 .fixed-ad-container {
     position: fixed;
@@ -286,18 +286,26 @@ textarea:focus {
     text-align: center;
     z-index: 1000;
     min-height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    padding: 2px 0;
+    padding: 4px 0;
+    box-sizing: border-box;
 }
 
-/* admaxスクリプトが生成する要素（iframe/table/div等）を画面幅に収める設定 */
+/* admaxが生成する全要素の不要な余白をリセットし、幅を画面内に収める */
+.fixed-ad-container * {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* 広告表示ブロック（iframe/table/div等）を中央にブロック配置 */
 .fixed-ad-container iframe,
 .fixed-ad-container table,
 .fixed-ad-container div,
 .fixed-ad-container ins {
+    display: block !important;
+    margin: 0 auto !important;
     max-width: 100% !important;
-    box-sizing: border-box !important;
 }
