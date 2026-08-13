@@ -276,6 +276,9 @@ textarea:focus {
 /* ---------- 広告帯（画面最下部に常時固定） ---------- */
 .ad-banner{
   flex:0 0 auto;
+  position:fixed;
+  buttom:0;
+  left:0;
   width:100%;
   min-height:50px;
   background: var(--paper);
@@ -287,6 +290,5 @@ textarea:focus {
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
   box-shadow: 0 -2px 8px rgba(43,43,51,.10);
-  position:relative;
   z-index:50;
 }
