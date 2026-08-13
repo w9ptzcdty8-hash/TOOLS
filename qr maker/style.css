@@ -286,7 +286,7 @@ textarea:focus {
   align-items:center;
   justify-content:center;
   overflow:hidden;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
   box-shadow: 0 -2px 8px rgba(43,43,51,.10);
