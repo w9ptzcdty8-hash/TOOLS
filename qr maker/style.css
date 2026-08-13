@@ -273,39 +273,20 @@ textarea:focus {
     flex: 1;
 }
 
-/* ==========================================
-   画面下部 固定広告エリア（位置ズレ・はみ出し修正版）
-   ========================================== */
-.fixed-ad-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #ffffff;
-    border-top: 1px solid #e5e7eb;
-    text-align: center;
-    z-index: 1000;
-    min-height: 50px;
-    padding: 4px 0;
-    box-sizing: border-box;
-}
-
-/* admaxが生成する全要素の不要な余白をリセットし、幅を画面内に収める */
-.fixed-ad-container * {
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* 広告表示ブロック（iframe/table/div等）を中央にブロック配置 */
-.fixed-ad-container iframe,
-.fixed-ad-container table,
-.fixed-ad-container div,
-.fixed-ad-container ins {
-    display: block !important;
-    margin: 0 auto !important;
-    max-width: 100% !important;
+/* ---------- 広告帯（画面最下部に常時固定） ---------- */
+.ad-banner{
+  flex:0 0 auto;
+  width:100%;
+  min-height:50px;
+  background: var(--paper);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  box-shadow: 0 -2px 8px rgba(43,43,51,.10);
+  position:relative;
+  z-index:50;
 }
