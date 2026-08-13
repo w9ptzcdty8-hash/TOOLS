@@ -284,7 +284,7 @@ textarea:focus {
     align-items: center;
     background-color: #121212;
     z-index: 1000;
-    padding-top: 10px;
+    padding-top: 1px;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
     border-top: 1px solid #333;
  }
