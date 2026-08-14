@@ -16,7 +16,8 @@ body {
     color: #E0E0E0;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100vh; /*旧ブラウザ用フォールバック*/
+    height: 100dvh; /*アドレスバー変動に対応*/
     overflow: hidden;
 }
 
@@ -59,7 +60,6 @@ main {
     flex: 1;
     overflow-y: auto;
     position: relative;
-    padding-bottom: 100px;
 }
 
 .tab-content {
@@ -76,7 +76,7 @@ main {
 .single-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    min-height: 100%;
 }
 
 .count-display-section {
@@ -130,6 +130,7 @@ main {
 .history-section {
     flex: 1;
     padding: 15px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* 広告分 + Safe Area */
     overflow-y: auto;
     background-color: #121212;
 }
@@ -217,8 +218,8 @@ main {
 /* --- マルチカウンター --- */
 .multi-container {
     padding: 15px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* 広告分 + Safe Area */
     overflow-y: auto;
-    height: 100%;
     display: flex;
     flex-direction: column;
     gap: 15px;
