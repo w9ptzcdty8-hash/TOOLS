@@ -59,7 +59,7 @@ main {
     flex: 1;
     overflow-y: auto;
     position: relative;
-    padding-bottom: 80px;
+    padding-bottom: 180px;
 }
 
 .tab-content {
