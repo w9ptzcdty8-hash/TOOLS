@@ -13,7 +13,7 @@ body {
     background-color: #f4f5f7;
     color: #333333;
     line-height: 1.5;
-    padding-bottom: 110px; /* 固定広告とコンテンツの重なりを防止 */
+    padding-bottom: 80px; /* 固定広告とコンテンツの重なりを防止 */
     user-select: none; /* テキストの誤選択を防止 */
     -webkit-user-select: none;
     -webkit-touch-callout: none;
