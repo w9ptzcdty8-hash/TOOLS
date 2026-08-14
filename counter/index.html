@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <!-- スマホ向けViewport設定（自動ズーム・誤作動防止） -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>スマホ向けカウンター</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ヘッダー：タブ選択 -->
+    <header>
+        <button class="tab-btn active" onclick="switchTab('single')">シングル</button>
+        <button class="tab-btn" onclick="switchTab('multi')">マルチ</button>
+    </header>
+
+    <main>
+        <!-- シングルカウンター タブ -->
+        <div id="single-tab" class="tab-content active">
+            <div class="single-container">
+                <div class="count-display-section">
+                    <div id="single-count" class="count-number">0</div>
+                    <div class="btn-group" style="margin-bottom: 10px;">
+                        <button class="btn btn-minus" onclick="changeSingleCount(-1)">ー</button>
+                        <button class="btn btn-plus" onclick="changeSingleCount(1)">＋</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-reset" onclick="resetSingleCount()">リセット</button>
+                        <button class="btn btn-save" onclick="saveSingleHistory()">保存</button>
+                    </div>
+                </div>
+
+                <div class="history-section">
+                    <div class="history-header">
+                        <span class="history-title">保存履歴</span>
+                        <button class="clear-history-btn" onclick="clearSingleHistory()">全削除</button>
+                    </div>
+                    <div class="custom-table-wrapper">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>日時</th>
+                                    <th>ラベル</th>
+                                    <th style="text-align: right;">カウント</th>
+                                </tr>
+                            </thead>
+                            <tbody id="single-history-body">
+                                <!-- JavaScriptで動的に追加されます -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- マルチカウンター タブ -->
+        <div id="multi-tab" class="tab-content">
+            <div class="multi-container">
+                <div class="multi-controls">
+                    <button class="add-counter-btn" onclick="addMultiCounter()">＋ カウンター追加</button>
+                    <button class="save-score-btn" onclick="saveMultiHistory()">保存</button>
+                </div>
+
+                <div id="multi-list" class="multi-list">
+                    <!-- カウンターカードがJavaScriptで挿入されます -->
+                </div>
+
+                <!-- 保存履歴一覧エリア -->
+                <div class="history-board-section">
+                    <div class="history-board-header">
+                        <span class="history-board-title">保存履歴</span>
+                        <button class="clear-history-btn" onclick="clearMultiHistory()">履歴クリア</button>
+                    </div>
+                    <div class="custom-table-wrapper">
+                        <table class="custom-table history-table" id="history-table">
+                            <thead id="history-table-head">
+                                <!-- JavaScriptで動的に挿入されます -->
+                            </thead>
+                            <tbody id="history-table-body">
+                                <!-- JavaScriptで動的に挿入されます -->
+                            </tbody>
+                            <tfoot id="history-table-foot">
+                                <!-- 各項目ごとの合計が動的に挿入されます -->
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
