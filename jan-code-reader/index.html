@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 電話番号の自動リンク化を無効化 -->
+    <meta name="format-detection" content="telephone=no">
+    <title>JANコードリーダー（Web版）</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- QuaggaJS (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+</head>
+<body>
+
+    <main id="app">
+        <header class="header">
+            <h1>JANコードリーダー</h1>
+        </header>
+
+        <!-- スキャナー表示領域 -->
+        <div class="scanner-container">
+            <div id="interactive" class="viewport"></div>
+            <div class="scanner-guide" id="scanner-guide"></div>
+        </div>
+
+        <!-- 読み取り結果・操作ボタン -->
+        <div class="result-container">
+            <p id="status-text" class="status-text">スキャン中…</p>
+            <div class="jan-code-row">
+                <span id="jan-code-display" class="jan-code-display">- - - - - - - - - - - - -</span>
+                <button id="btn-copy" class="btn-sub" disabled>コピー</button>
+                <button id="btn-save" class="btn-sub" disabled>保存</button>
+                <button id="btn-reset" class="btn-reset-x" disabled title="リセット">✕</button>
+            </div>
+        </div>
+
+        <!-- 検索ボタン -->
+        <div class="button-group">
+            <button id="btn-search-main" class="btn btn-main" disabled>検索</button>
+        </div>
+
+        <!-- 保存リストエリア -->
+        <section class="saved-section">
+            <h2>保存リスト</h2>
+            <div id="saved-list" class="saved-list">
+                <!-- 保存アイテムが動的に追加されます -->
+            </div>
+        </section>
+
+        <!-- MRS TOOLS リンクエリア -->
+        <div class="footer-link-container">
+            <a href="https://mrs-tools.pages.dev/" target="_blank" rel="noopener noreferrer" class="btn-footer-link">MRS TOOLS</a>
+        </div>
+    </main>
+
+    <!-- 検索先選択モーダル -->
+    <div id="search-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>検索先を選択</h3>
+            <p id="modal-jan-code" class="modal-code"></p>
+            <div class="modal-buttons">
+                <button class="btn btn-search-option btn-google" data-site="google">Googleで検索</button>
+                <button class="btn btn-search-option btn-amazon" data-site="amazon">AMAZONで検索</button>
+                <button class="btn btn-search-option btn-rakuten" data-site="rakuten">楽天で検索</button>
+                <button class="btn btn-search-option btn-mercari" data-site="mercari">メルカリで検索</button>
+            </div>
+            <button id="btn-close-modal" class="btn-close">キャンセル</button>
+        </div>
+    </div>
+
+    <!-- 非停止型トースト通知 -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- 固定広告枠 -->
+    <div class="ad-banner">
+        <div style="max-width: 100%;">
+            <!-- admax -->
+            <script src="https://adm.shinobi.jp/s/8a495d941206bf0c34aff9559f8d2cea"></script>
+            <!-- admax -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

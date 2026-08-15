@@ -1,0 +1,476 @@
+/* ========================================
+   MRS WORKS - JAN Code Reader Styles
+======================================== */
+
+:root {
+    --ad-height: 60px;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+    overflow-x: hidden;
+}
+
+#app {
+    width: 100%;
+    max-width: 600px;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 16px;
+    padding-bottom: calc(var(--ad-height) + env(safe-area-inset-bottom) + 20px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    width: 100%;
+    text-align: center;
+    padding: 4px 0;
+}
+
+.header h1 {
+    font-size: 1.1rem;
+    margin: 0;
+    letter-spacing: 1px;
+    color: #eeeeee;
+}
+
+/* スキャナービューポート */
+.scanner-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    background-color: #111111;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.viewport {
+    width: 100%;
+    height: 100%;
+}
+
+.viewport video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.viewport canvas.drawingBuffer {
+    display: none;
+}
+
+/* 読み取りガイド枠 */
+.scanner-guide {
+    position: absolute;
+    width: 75%;
+    height: 45%;
+    border: 3px solid #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    transition: border-color 0.3s ease;
+}
+
+.scanner-guide.success {
+    animation: success-pulse 0.6s ease-in-out forwards;
+}
+
+@keyframes success-pulse {
+    0% {
+        border-color: #00ff66;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4), 0 0 20px #00ff66;
+    }
+    50% {
+        border-color: #00ff66;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4), 0 0 35px #00ff66;
+    }
+    100% {
+        border-color: #00ff66;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4), 0 0 15px #00ff66;
+    }
+}
+
+/* ステータスと表示領域 */
+.result-container {
+    width: 100%;
+    text-align: center;
+    margin: 10px 0 8px 0;
+}
+
+.status-text {
+    font-size: 0.85rem;
+    color: #aaaaaa;
+    margin: 0 0 4px 0;
+}
+
+.jan-code-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    background-color: #1a1a1a;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #333333;
+}
+
+.jan-code-display {
+    font-size: 1rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #ffffff;
+    flex-grow: 1;
+    text-align: left;
+    word-break: break-all;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    pointer-events: none;
+}
+
+/* ボタン共通 */
+.btn {
+    min-height: 44px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.btn:disabled {
+    background-color: #333333 !important;
+    color: #777777 !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-sub {
+    min-height: 34px;
+    padding: 0 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #555555;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-sub:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-reset-x {
+    background: none;
+    border: none;
+    color: #ff5555;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 0 4px 0 6px;
+    cursor: pointer;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.btn-reset-x:disabled {
+    color: #444444;
+    cursor: not-allowed;
+}
+
+.button-group {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.btn-main {
+    width: 100%;
+    min-height: 44px;
+    font-size: 1rem;
+    background-color: #2563eb;
+}
+
+/* 保存リスト */
+.saved-section {
+    width: 100%;
+    margin-top: 6px;
+}
+
+.saved-section h2 {
+    font-size: 0.9rem;
+    color: #cccccc;
+    margin: 0 0 8px 0;
+    border-bottom: 1px solid #333333;
+    padding-bottom: 4px;
+}
+
+.saved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.saved-item {
+    background-color: #1a1a1a;
+    border: 1px solid #333333;
+    border-radius: 6px;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.saved-item-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.saved-item-code {
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: #00ff66;
+    line-height: 1.1;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.saved-item-memo {
+    width: 100%;
+    background-color: #111111;
+    border: 1px solid #333333;
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    height: 24px;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.saved-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.btn-icon-sub {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    border: 1px solid #444444;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-delete-x {
+    background: none;
+    border: none;
+    color: #ff5555;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 0 4px 0 6px;
+    cursor: pointer;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete-x:active {
+    opacity: 0.6;
+}
+
+/* MRS TOOLS リンクスタイル（控えめなモノトーンテキストリンク） */
+.footer-link-container {
+    width: 100%;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.btn-footer-link {
+    display: inline-block;
+    color: #888888;
+    font-size: 0.85rem;
+    font-weight: normal;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    border-radius: 0;
+    min-height: auto;
+    padding: 4px 8px;
+    transition: color 0.2s;
+}
+
+.btn-footer-link:active,
+.btn-footer-link:hover {
+    color: #cccccc;
+    background-color: transparent;
+    transform: none;
+}
+
+/* モーダル */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal-content {
+    background-color: #1e1e1e;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 360px;
+    padding: 18px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 1px solid #444444;
+    text-align: center;
+}
+
+.modal-content h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.05rem;
+}
+
+.modal-code {
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: #00ff66;
+    margin: 0 0 14px 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.btn-search-option {
+    min-height: 44px;
+    font-size: 0.95rem;
+}
+
+.btn-search-option.btn-google {
+    background-color: #4285f4;
+}
+
+.btn-search-option.btn-amazon {
+    background-color: #ff9900;
+}
+
+.btn-search-option.btn-rakuten {
+    background-color: #bf0000;
+}
+
+.btn-search-option.btn-mercari {
+    background-color: #ff0211;
+}
+
+.btn-close {
+    width: 100%;
+    padding: 8px;
+    background-color: transparent;
+    border: 1px solid #555555;
+    color: #aaaaaa;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* トースト表示 */
+.toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #00ff66;
+    border: 1px solid #00ff66;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    z-index: 3000;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    opacity: 1;
+}
+
+.toast.hidden {
+    opacity: 0;
+}
+
+/* 固定広告枠 */
+.ad-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #121212;
+    z-index: 1000;
+    padding-top: 1px;
+    padding-bottom: calc(1px + env(safe-area-inset-bottom));
+    border-top: 1px solid #333333;
+    min-height: var(--ad-height);
+}
