@@ -1,0 +1,616 @@
+/* ========================================
+   メトロノーム | MRS TOOLS
+======================================== */
+
+:root {
+    --ad-height: 60px;
+
+    --color-bg: #090c16;
+    --color-bg-2: #121936;
+    --color-surface: #151d3b;
+    --color-surface-2: #1d2650;
+    --color-border: #2a3566;
+    --color-accent: #35e0c2;
+    --color-accent-soft: rgba(53, 224, 194, 0.16);
+    --color-gold: #ffcc4d;
+    --color-gold-soft: rgba(255, 204, 77, 0.18);
+    --color-danger: #ff3d81;
+    --color-text: #eef1fb;
+    --color-text-dim: #8a92b8;
+
+    --radius-lg: 22px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+
+    --font-display: "Helvetica Neue", Arial, "Hiragino Sans", sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Roboto Mono", "Consolas", monospace;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+}
+
+button {
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    background: none;
+    color: inherit;
+}
+
+#app {
+    min-height: 100dvh;
+    padding-bottom: calc(var(--ad-height) + env(safe-area-inset-bottom) + 20px);
+    background: radial-gradient(circle at 50% 0%, var(--color-bg-2) 0%, var(--color-bg) 65%);
+}
+
+.tool-main {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 24px 18px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ---------------- ヘッダー ---------------- */
+
+.eyebrow {
+    margin: 0;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    color: var(--color-accent);
+    font-weight: 700;
+}
+
+.tool-title {
+    margin: 4px 0 0 0;
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-shadow: 0 0 24px var(--color-accent-soft);
+}
+
+/* ---------------- 拍アニメーションゾーン（相対配置） ---------------- */
+
+.pulse-zone {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0 4px;
+}
+
+/* ---------------- ステータス / エラーメッセージ ---------------- */
+
+.status-message {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92%;
+    max-width: 360px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(20, 10, 25, 0.94);
+    border: 1px solid var(--color-danger);
+    color: #ff85ae;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    z-index: 20;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.status-message.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.pulse-orb {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 35% 30%, var(--color-surface-2), var(--color-surface));
+    border: 2px solid var(--color-border);
+    box-shadow: 0 0 0 rgba(53, 224, 194, 0);
+    transition: transform 0.06s ease-out, box-shadow 0.08s ease-out, border-color 0.08s ease-out;
+}
+
+.pulse-orb.tick {
+    transform: scale(1.08);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 32px var(--color-accent-soft);
+}
+
+.pulse-orb.tick.accent {
+    transform: scale(1.16);
+    border-color: var(--color-gold);
+    box-shadow: 0 0 40px var(--color-gold-soft);
+}
+
+.pulse-beat-num {
+    font-family: var(--font-mono);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-text-dim);
+    font-variant-numeric: tabular-nums;
+    transition: color 0.08s ease-out;
+}
+
+.pulse-orb.tick .pulse-beat-num {
+    color: var(--color-accent);
+}
+
+.pulse-orb.tick.accent .pulse-beat-num {
+    color: var(--color-gold);
+}
+
+.beat-dots {
+    display: flex;
+    gap: 10px;
+}
+
+.beat-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    transition: background 0.08s ease-out, border-color 0.08s ease-out, transform 0.08s ease-out;
+}
+
+.beat-dot.accent-slot {
+    border-color: var(--color-gold);
+}
+
+.beat-dot.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    transform: scale(1.2);
+}
+
+.beat-dot.active.accent-slot {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+}
+
+/* ---------------- 再生ボタン ---------------- */
+
+.transport {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-transport {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, var(--color-accent) 0%, #1fb89e 100%);
+    box-shadow: 0 10px 28px var(--color-accent-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+}
+
+.btn-transport:active {
+    transform: scale(0.94);
+}
+
+.play-icon {
+    width: 0;
+    height: 0;
+    border-top: 13px solid transparent;
+    border-bottom: 13px solid transparent;
+    border-left: 20px solid #05261f;
+    margin-left: 4px;
+}
+
+.play-icon.is-playing {
+    width: 20px;
+    height: 20px;
+    margin-left: 0;
+    border: none;
+    background: #05261f;
+    border-radius: 3px;
+}
+
+/* ---------------- タブナビゲーション ---------------- */
+
+.tab-nav {
+    display: flex;
+    gap: 6px;
+    background: var(--color-surface);
+    padding: 5px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text-dim);
+    transition: all 0.15s ease;
+}
+
+.tab-btn.is-active {
+    background: var(--color-surface-2);
+    color: var(--color-accent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ---------------- タブコンテンツ / パネル ---------------- */
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.is-active {
+    display: block;
+}
+
+.panel {
+    background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg-2) 100%);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 18px 18px 20px;
+}
+
+.panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.panel-title {
+    margin: 0 0 12px 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.panel-head .panel-title {
+    margin-bottom: 0;
+}
+
+.field-label {
+    margin: 14px 0 8px 0;
+    font-size: 0.78rem;
+    color: var(--color-text-dim);
+}
+
+.field-label:first-of-type {
+    margin-top: 4px;
+}
+
+/* ---------------- BPM ---------------- */
+
+.bpm-readout {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.bpm-number {
+    width: 104px;
+    padding: 0 4px;
+    background: transparent;
+    border: none;
+    color: var(--color-gold);
+    font-family: var(--font-mono);
+    font-size: 1.9rem;
+    font-weight: 700;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.bpm-number:focus {
+    outline: none;
+}
+
+.bpm-unit {
+    font-size: 0.75rem;
+    color: var(--color-text-dim);
+    letter-spacing: 1px;
+}
+
+.bpm-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.bpm-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--color-surface-2);
+    outline: none;
+}
+
+.bpm-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+}
+
+.bpm-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-accent);
+    cursor: pointer;
+}
+
+.btn-step {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-step:active {
+    background: var(--color-bg-2);
+}
+
+/* ---------------- セグメントボタン ---------------- */
+
+.segmented {
+    display: flex;
+    gap: 8px;
+}
+
+.segmented-wrap {
+    flex-wrap: wrap;
+}
+
+.seg-btn {
+    flex: 1;
+    min-height: 42px;
+    padding: 0 10px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text-dim);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.seg-btn.is-active {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.seg-btn.accent-active {
+    background: var(--color-gold-soft);
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+}
+
+/* ---------------- カスタム音源 ---------------- */
+
+.custom-panel {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.custom-panel.hidden {
+    display: none;
+}
+
+.upload-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.upload-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.85rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.status-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.upload-status {
+    font-size: 0.7rem;
+    color: var(--color-text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.btn-clear {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger);
+    font-size: 0.75rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background 0.15s, color 0.15s;
+}
+
+.btn-clear:active {
+    background: var(--color-danger);
+    color: #fff;
+}
+
+.btn-clear.hidden {
+    display: none;
+}
+
+.upload-input {
+    display: none;
+}
+
+.btn-upload {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.btn-upload:active {
+    background: var(--color-bg-2);
+}
+
+.upload-hint {
+    margin: 0;
+    font-size: 0.72rem;
+    color: var(--color-text-dim);
+    line-height: 1.5;
+}
+
+/* ---------------- ダウンロード ---------------- */
+
+.download-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.download-row .field-label {
+    margin: 0;
+}
+
+.bars-input {
+    width: 72px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    text-align: center;
+}
+
+.bars-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+.btn-download {
+    width: 100%;
+    min-height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-download:active {
+    transform: scale(0.98);
+}
+
+.btn-download:disabled {
+    opacity: 0.5;
+}
+
+/* ---------------- フッター ---------------- */
+
+.tool-footer {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 4px;
+}
+
+.mrs-tools-link {
+    padding: 4px 10px;
+    color: var(--color-text-dim);
+    font-size: 0.8rem;
+    text-decoration: underline;
+}
+
+.mrs-tools-link:active {
+    color: var(--color-text);
+}
+
+/* ---------------- 広告 ---------------- */
+
+.ad-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: var(--ad-height);
+    background-color: #121212;
+    z-index: 1000;
+    padding-top: 1px;
+    padding-bottom: calc(1px + env(safe-area-inset-bottom));
+    border-top: 1px solid #333;
+}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+
+    <title>メトロノーム | MRS TOOLS</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app">
+        <main class="tool-main">
+
+            <header class="tool-header">
+                <p class="eyebrow">MRS TOOLS</p>
+                <h1 class="tool-title">メトロノーム</h1>
+            </header>
+
+            <!-- ========== 拍アニメーションエリア（メッセージ表示領域を包含） ========== -->
+            <section class="pulse-zone" aria-hidden="true">
+                <!-- メッセージ表示エリア（レイアウトを崩さないオーバーレイ表示） -->
+                <div id="status-message" class="status-message hidden" role="alert"></div>
+
+                <div id="pulse-orb" class="pulse-orb">
+                    <span id="pulse-beat-num" class="pulse-beat-num">1</span>
+                </div>
+                <div id="beat-dots" class="beat-dots"></div>
+            </section>
+
+            <!-- ========== 再生ボタン ========== -->
+            <section class="transport">
+                <button id="btn-play-stop" class="btn-transport" aria-label="再生/停止">
+                    <span id="play-icon" class="play-icon"></span>
+                </button>
+            </section>
+
+            <!-- ========== タブナビゲーション ========== -->
+            <nav class="tab-nav" role="tablist" aria-label="設定カテゴリ">
+                <button type="button" class="tab-btn is-active" data-tab="tab-speed" role="tab" aria-selected="true" aria-controls="tab-speed">速さ</button>
+                <button type="button" class="tab-btn" data-tab="tab-rhythm" role="tab" aria-selected="false" aria-controls="tab-rhythm">リズム</button>
+                <button type="button" class="tab-btn" data-tab="tab-sound" role="tab" aria-selected="false" aria-controls="tab-sound">音色</button>
+                <button type="button" class="tab-btn" data-tab="tab-download" role="tab" aria-selected="false" aria-controls="tab-download">DL</button>
+            </nav>
+
+            <!-- ========== タブコンテンツグループ ========== -->
+            <div class="tab-contents">
+                <!-- ========== 速さ ========== -->
+                <section id="tab-speed" class="panel tab-panel is-active" role="tabpanel">
+                    <div class="panel-head">
+                        <h2 class="panel-title">テンポ</h2>
+                        <div class="bpm-readout">
+                            <input type="number" id="bpm-number" class="bpm-number" min="30" max="600" value="120" inputmode="numeric">
+                            <span class="bpm-unit">BPM</span>
+                        </div>
+                    </div>
+                    <div class="bpm-slider-row">
+                        <button id="bpm-minus" class="btn-step" aria-label="BPMを下げる">−</button>
+                        <input type="range" id="bpm-slider" class="bpm-slider" min="30" max="600" step="1" value="120">
+                        <button id="bpm-plus" class="btn-step" aria-label="BPMを上げる">＋</button>
+                    </div>
+                </section>
+
+                <!-- ========== リズム ========== -->
+                <section id="tab-rhythm" class="panel tab-panel" role="tabpanel">
+                    <h2 class="panel-title">リズム</h2>
+
+                    <p class="field-label">拍子</p>
+                    <div id="beats-select" class="segmented" role="group" aria-label="拍子の選択"></div>
+
+                    <p class="field-label">アクセントを入れる拍</p>
+                    <div id="accent-select" class="segmented" role="group" aria-label="アクセント拍の選択"></div>
+                </section>
+
+                <!-- ========== 音色 ========== -->
+                <section id="tab-sound" class="panel tab-panel" role="tabpanel">
+                    <h2 class="panel-title">音色</h2>
+
+                    <div id="preset-select" class="segmented segmented-wrap" role="group" aria-label="音色の選択"></div>
+
+                    <div id="custom-panel" class="custom-panel hidden">
+                        <div class="upload-row">
+                            <label class="upload-label" for="upload-normal">
+                                通常音
+                                <div class="status-wrapper">
+                                    <span id="upload-normal-status" class="upload-status">未設定</span>
+                                    <button type="button" id="btn-clear-normal" class="btn-clear hidden" aria-label="通常音をリセット">×</button>
+                                </div>
+                            </label>
+                            <input type="file" id="upload-normal" accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg" class="upload-input">
+                            <button type="button" class="btn-upload" data-target="upload-normal">ファイルを選択</button>
+                        </div>
+                        <div class="upload-row">
+                            <label class="upload-label" for="upload-accent">
+                                アクセント音（任意）
+                                <div class="status-wrapper">
+                                    <span id="upload-accent-status" class="upload-status">未設定</span>
+                                    <button type="button" id="btn-clear-accent" class="btn-clear hidden" aria-label="アクセント音をリセット">×</button>
+                                </div>
+                            </label>
+                            <input type="file" id="upload-accent" accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg" class="upload-input">
+                            <button type="button" class="btn-upload" data-target="upload-accent">ファイルを選択</button>
+                        </div>
+                        <p class="upload-hint">アクセント音を設定しない場合、通常音を自動でピッチアップして代用します。（音声は2秒以内のものが使用できます）</p>
+                    </div>
+                </section>
+
+                <!-- ========== ダウンロード ========== -->
+                <section id="tab-download" class="panel tab-panel" role="tabpanel">
+                    <h2 class="panel-title">リズム音声をダウンロード</h2>
+                    <div class="download-row">
+                        <label class="field-label" for="bars-input">小節数 (1〜64)</label>
+                        <input type="number" id="bars-input" class="bars-input" min="1" max="64" value="8" inputmode="numeric">
+                    </div>
+                    <button id="btn-download" class="btn-download">
+                        <span id="download-label">WAVファイルをダウンロード</span>
+                    </button>
+                </section>
+            </div>
+
+            <footer class="tool-footer">
+                <a href="https://mrs-tools.pages.dev/" target="_blank" rel="noopener noreferrer" class="mrs-tools-link">MRS TOOLS</a>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- ========================================
+         固定広告
+    ========================================= -->
+    <div class="ad-banner">
+        <div style="max-width: 100%;">
+            <!-- admax -->
+            <script src="https://adm.shinobi.jp/s/1596a166ea799d6e2c02f5a97ee144c2"></script>
+            <!-- admax -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
