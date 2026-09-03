@@ -61,13 +61,16 @@
             flex: 1;
             overflow-y: auto;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .tab-content {
             display: none;
-            height: 100%;
+            flex: 1;
             flex-direction: column;
             padding: 15px;
+            overflow-y: auto;
         }
 
         .tab-content.active {
@@ -484,6 +487,7 @@
             padding: 12px;
             text-align: center;
             flex-shrink: 0;
+            margin-top: auto;
         }
 
         footer a {
@@ -608,11 +612,11 @@
                 </div>
             </div>
         </div>
-    </main>
 
-    <footer>
-        <a href="http://mrs-tools.pages.dev" target="_blank">MRS TOOLS</a>
-    </footer>
+        <footer>
+            <a href="http://mrs-tools.pages.dev" target="_blank" rel="noopener noreferrer">MRS TOOLS</a>
+        </footer>
+    </main>
 
     <script>
         let audioCtx = null;
@@ -724,7 +728,6 @@
                     li.className = 'wheel-item';
                     li.textContent = i;
                     
-                    // クリック/タップで数字の直接指定・入力（確実に反応するようpointerupまたはclickに設定）
                     li.addEventListener('click', (e) => {
                         e.stopPropagation();
                         this.promptDirectInput(i);
@@ -876,7 +879,7 @@
                             id: t.id,
                             label: t.label,
                             totalSec: t.totalSec,
-                            remainingSec: t.totalSec, // 再読み込み時は初期���定値にリセット、または一時停止状態として復元
+                            remainingSec: t.totalSec,
                             isRunning: false,
                             intervalId: null
                         }));
