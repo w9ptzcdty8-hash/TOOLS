@@ -12,14 +12,9 @@
         <main class="tool-main">
 
             <header class="tool-header">
-                <p class="eyebrow">MRS TOOLS</p>
-                <h1 class="tool-title">マルチタイマー＆プレゼンベル</h1>
+                <button class="tab-btn is-active" data-tab="timer-tab" onclick="switchTab('timer-tab')">タイマー</button>
+                <button class="tab-btn" data-tab="presen-tab" onclick="switchTab('presen-tab')">プレゼン</button>
             </header>
-
-            <nav class="tab-nav" role="tablist" aria-label="タブ">
-                <button type="button" class="tab-btn is-active" data-tab="timer-tab" role="tab" aria-selected="true" aria-controls="timer-tab">タイマー</button>
-                <button type="button" class="tab-btn" data-tab="presen-tab" role="tab" aria-selected="false" aria-controls="presen-tab">プレゼン</button>
-            </nav>
 
             <div id="timer-tab" class="tab-content is-active" role="tabpanel">
                 <div class="multi-timer-container">
