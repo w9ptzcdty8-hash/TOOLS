@@ -477,6 +477,25 @@
             padding: 30px 0;
             font-size: 14px;
         }
+
+        footer {
+            background-color: #121212;
+            border-top: 1px solid #222;
+            padding: 12px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        footer a {
+            color: #FF9800;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        footer a:hover {
+            color: #FFB74D;
+        }
     </style>
 </head>
 <body>
@@ -590,6 +609,10 @@
             </div>
         </div>
     </main>
+
+    <footer>
+        <a href="http://mrs-tools.pages.dev" target="_blank">MRS TOOLS</a>
+    </footer>
 
     <script>
         let audioCtx = null;
@@ -853,7 +876,7 @@
                             id: t.id,
                             label: t.label,
                             totalSec: t.totalSec,
-                            remainingSec: t.totalSec, // 再読み込み時は初期設定値にリセット、または一時停止状態として復元
+                            remainingSec: t.totalSec, // 再読み込み時は初期���定値にリセット、または一時停止状態として復元
                             isRunning: false,
                             intervalId: null
                         }));
@@ -998,102 +1021,42 @@
         }
 
         function deleteTimer(id) {
-            const target = timers.find(t => t.id === id);
-            if (target) {
-                clearInterval(target.intervalId);
-            }
-            timers = timers.filter(t => t.id !== id);
+            const target = timers.findIndex(t => t.id === id);
+            if (target === -1) return;
+
+            const timerToDelete = timers[target];
+            clearInterval(timerToDelete.intervalId);
+            timers.splice(target, 1);
             renderTimers();
             saveTimersToStorage();
         }
 
-        let presenState = {
-            elapsedSec: 0,
-            isRunning: false,
-            intervalId: null,
-            rungBells: { bell1: false, bell2: false, bell3: false }
-        };
-
-        function renderPresen() {
-            const presenDisplay = document.getElementById('presen-display');
-            if (!presenDisplay) return;
-            const m = String(Math.floor(presenState.elapsedSec / 60)).padStart(2, '0');
-            const s = String(presenState.elapsedSec % 60).padStart(2, '0');
-            presenDisplay.textContent = `${m}:${s}`;
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
         }
 
-        function togglePresenTimer() {
-            initAudio();
-            const presenStartBtn = document.getElementById('presen-start-btn');
-            if (presenState.isRunning) {
-                clearInterval(presenState.intervalId);
-                presenState.isRunning = false;
-                if (presenStartBtn) {
-                    presenStartBtn.textContent = '再開';
-                    presenStartBtn.style.backgroundColor = '#2E7D32';
-                }
-            } else {
-                presenState.isRunning = true;
-                if (presenStartBtn) {
-                    presenStartBtn.textContent = '一時停止';
-                    presenStartBtn.style.backgroundColor = '#E65100';
-                }
-
-                presenState.intervalId = setInterval(() => {
-                    presenState.elapsedSec++;
-                    renderPresen();
-                    checkPresenBells();
-                }, 1000);
-            }
-        }
-
-        function resetPresenTimer() {
-            const presenStartBtn = document.getElementById('presen-start-btn');
-            clearInterval(presenState.intervalId);
-            presenState.isRunning = false;
-            presenState.elapsedSec = 0;
-            presenState.rungBells = { bell1: false, bell2: false, bell3: false };
-            renderPresen();
-            if (presenStartBtn) {
-                presenStartBtn.textContent = 'スタート';
-                presenStartBtn.style.backgroundColor = '#2E7D32';
-            }
-        }
-
-        function checkPresenBells() {
-            const b1Sec = (parseInt(document.getElementById('bell1-min').value) || 0) * 60 + (parseInt(document.getElementById('bell1-sec').value) || 0);
-            const b2Sec = (parseInt(document.getElementById('bell2-min').value) || 0) * 60 + (parseInt(document.getElementById('bell2-sec').value) || 0);
-            const b3Sec = (parseInt(document.getElementById('bell3-min').value) || 0) * 60 + (parseInt(document.getElementById('bell3-sec').value) || 0);
-
-            const b2Enable = document.getElementById('bell2-enable').checked;
-            const b3Enable = document.getElementById('bell3-enable').checked;
-
-            if (!presenState.rungBells.bell1 && presenState.elapsedSec === b1Sec) {
-                playRingBell(1);
-                presenState.rungBells.bell1 = true;
-            }
-
-            if (b2Enable && !presenState.rungBells.bell2 && presenState.elapsedSec === b2Sec) {
-                playRingBell(2);
-                presenState.rungBells.bell2 = true;
-            }
-
-            if (b3Enable && !presenState.rungBells.bell3 && presenState.elapsedSec === b3Sec) {
-                playRingBell(3);
-                presenState.rungBells.bell3 = true;
-            }
-        }
+        let presenStartTime = 0;
+        let presenElapsed = 0;
+        let presenIntervalId = null;
+        let presenBellsRung = new Set();
 
         function savePresenSettings() {
             const settings = {
-                b1m: document.getElementById('bell1-min').value,
-                b1s: document.getElementById('bell1-sec').value,
-                b2m: document.getElementById('bell2-min').value,
-                b2s: document.getElementById('bell2-sec').value,
-                b2e: document.getElementById('bell2-enable').checked,
-                b3m: document.getElementById('bell3-min').value,
-                b3s: document.getElementById('bell3-sec').value,
-                b3e: document.getElementById('bell3-enable').checked,
+                bell1Min: parseInt(document.getElementById('bell1-min').value) || 0,
+                bell1Sec: parseInt(document.getElementById('bell1-sec').value) || 0,
+                bell2Min: parseInt(document.getElementById('bell2-min').value) || 0,
+                bell2Sec: parseInt(document.getElementById('bell2-sec').value) || 0,
+                bell2Enable: document.getElementById('bell2-enable').checked,
+                bell3Min: parseInt(document.getElementById('bell3-min').value) || 0,
+                bell3Sec: parseInt(document.getElementById('bell3-sec').value) || 0,
+                bell3Enable: document.getElementById('bell3-enable').checked
             };
             localStorage.setItem('presen_bell_settings', JSON.stringify(settings));
         }
@@ -1102,34 +1065,86 @@
             const data = localStorage.getItem('presen_bell_settings');
             if (data) {
                 try {
-                    const s = JSON.parse(data);
-                    document.getElementById('bell1-min').value = s.b1m ?? 7;
-                    document.getElementById('bell1-sec').value = s.b1s ?? 0;
-                    document.getElementById('bell2-min').value = s.b2m ?? 10;
-                    document.getElementById('bell2-sec').value = s.b2s ?? 0;
-                    document.getElementById('bell2-enable').checked = s.b2e ?? true;
-                    document.getElementById('bell3-min').value = s.b3m ?? 15;
-                    document.getElementById('bell3-sec').value = s.b3s ?? 0;
-                    document.getElementById('bell3-enable').checked = s.b3e ?? true;
-                } catch(e) {}
+                    const settings = JSON.parse(data);
+                    document.getElementById('bell1-min').value = settings.bell1Min;
+                    document.getElementById('bell1-sec').value = settings.bell1Sec;
+                    document.getElementById('bell2-min').value = settings.bell2Min;
+                    document.getElementById('bell2-sec').value = settings.bell2Sec;
+                    document.getElementById('bell2-enable').checked = settings.bell2Enable;
+                    document.getElementById('bell3-min').value = settings.bell3Min;
+                    document.getElementById('bell3-sec').value = settings.bell3Sec;
+                    document.getElementById('bell3-enable').checked = settings.bell3Enable;
+                } catch(e) {
+                    console.error('プレゼンベル設定の読み込みエラー', e);
+                }
             }
         }
 
-        function escapeHtml(str) {
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        function updatePresenDisplay() {
+            const minutes = Math.floor(presenElapsed / 60);
+            const seconds = presenElapsed % 60;
+            document.getElementById('presen-display').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            checkBells();
         }
 
-        window.onload = function() {
-            pickerHours = new WheelPicker('wheel-hours', 0, 23, 0, '時間');
-            pickerMinutes = new WheelPicker('wheel-minutes', 0, 59, 5, '分');
-            pickerSeconds = new WheelPicker('wheel-seconds', 0, 59, 0, '秒');
+        function checkBells() {
+            const bell1Time = parseInt(document.getElementById('bell1-min').value) * 60 + parseInt(document.getElementById('bell1-sec').value);
+            const bell2Time = parseInt(document.getElementById('bell2-min').value) * 60 + parseInt(document.getElementById('bell2-sec').value);
+            const bell3Time = parseInt(document.getElementById('bell3-min').value) * 60 + parseInt(document.getElementById('bell3-sec').value);
+            const bell2Enable = document.getElementById('bell2-enable').checked;
+            const bell3Enable = document.getElementById('bell3-enable').checked;
 
+            if (presenElapsed === bell1Time && !presenBellsRung.has('bell1')) {
+                playRingBell(1);
+                presenBellsRung.add('bell1');
+            }
+            if (bell2Enable && presenElapsed === bell2Time && !presenBellsRung.has('bell2')) {
+                playRingBell(1);
+                presenBellsRung.add('bell2');
+            }
+            if (bell3Enable && presenElapsed === bell3Time && !presenBellsRung.has('bell3')) {
+                playRingBell(1);
+                presenBellsRung.add('bell3');
+            }
+        }
+
+        function togglePresenTimer() {
+            if (presenIntervalId) {
+                clearInterval(presenIntervalId);
+                presenIntervalId = null;
+                document.getElementById('presen-start-btn').textContent = 'スタート';
+            } else {
+                initAudio();
+                presenStartTime = Date.now() - presenElapsed * 1000;
+                document.getElementById('presen-start-btn').textContent = 'ストップ';
+                presenIntervalId = setInterval(() => {
+                    presenElapsed = Math.floor((Date.now() - presenStartTime) / 1000);
+                    updatePresenDisplay();
+                }, 100);
+            }
+        }
+
+        function resetPresenTimer() {
+            if (presenIntervalId) {
+                clearInterval(presenIntervalId);
+                presenIntervalId = null;
+            }
+            presenElapsed = 0;
+            presenBellsRung.clear();
+            updatePresenDisplay();
+            document.getElementById('presen-start-btn').textContent = 'スタート';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
             loadTimersFromStorage();
             loadPresenSettings();
             renderTimers();
-            renderPresen();
-        };
+            updatePresenDisplay();
+
+            pickerHours = new WheelPicker('wheel-hours', 0, 23, 0, '時間');
+            pickerMinutes = new WheelPicker('wheel-minutes', 0, 59, 1, '分');
+            pickerSeconds = new WheelPicker('wheel-seconds', 0, 59, 30, '秒');
+        });
     </script>
 </body>
 </html>
-
