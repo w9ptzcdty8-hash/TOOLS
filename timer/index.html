@@ -8,123 +8,118 @@
 </head>
 <body>
 
-    <div id="app">
-        <main class="tool-main">
+    <!-- ヘッダー：タブ選択 -->
+    <header>
+        <button class="tab-btn active" onclick="switchTab('timer')">タイマー</button>
+        <button class="tab-btn" onclick="switchTab('presen')">プレゼン</button>
+    </header>
 
-            <header class="tool-header">
-                <button class="tab-btn is-active" data-tab="timer-tab" onclick="switchTab('timer-tab')">タイマー</button>
-                <button class="tab-btn" data-tab="presen-tab" onclick="switchTab('presen-tab')">プレゼン</button>
-            </header>
-
-            <div id="timer-tab" class="tab-content is-active" role="tabpanel">
-                <div class="multi-timer-container">
-                    <div class="accordion-card" id="add-timer-accordion">
-                        <button class="accordion-header" onclick="toggleAccordion()">
-                            <span>＋ 新しいタイマーを設定</span>
-                            <span class="accordion-icon">▼</span>
-                        </button>
-                        <div class="accordion-body">
-                            <input type="text" id="new-timer-label" class="label-input" placeholder="タイマー名 (例: パスタ、筋トレ)">
-
-                            <div class="wheel-picker-wrapper">
-                                <div class="wheel-selection-bar"></div>
-                                <div class="wheel-column-group">
-                                    <div class="wheel-column">
-                                        <div class="wheel-container" id="wheel-hours">
-                                            <ul class="wheel-list"></ul>
-                                        </div>
-                                        <span class="wheel-unit">時間</span>
-                                    </div>
-                                    <div class="wheel-column">
-                                        <div class="wheel-container" id="wheel-minutes">
-                                            <ul class="wheel-list"></ul>
-                                        </div>
-                                        <span class="wheel-unit">分</span>
-                                    </div>
-                                    <div class="wheel-column">
-                                        <div class="wheel-container" id="wheel-seconds">
-                                            <ul class="wheel-list"></ul>
-                                        </div>
-                                        <span class="wheel-unit">秒</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button class="add-btn" onclick="addNewTimer()">タイマーを追加</button>
-                        </div>
-                    </div>
-
-                    <div id="timers-list" class="timers-list"></div>
-                </div>
-            </div>
-
-            <div id="presen-tab" class="tab-content" role="tabpanel">
-                <div class="presen-container">
-                    <div class="presen-timer-card">
-                        <div style="font-size: 12px; color: #888;">経過時間</div>
-                        <div id="presen-display" class="presen-time-display">00:00</div>
-                        
-                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-                            <button id="presen-start-btn" class="add-btn" style="background-color: #2E7D32; color: #FFF; padding: 10px 24px;" onclick="togglePresenTimer()">スタート</button>
-                            <button class="add-btn" style="background-color: #333; color: #AAA; padding: 10px 24px;" onclick="resetPresenTimer()">リセット</button>
-                        </div>
-                    </div>
-
-                    <button class="manual-bell-btn" onclick="playRingBell(1)">
-                        🔔 手動でベルを鳴らす (チーン)
+    <main>
+        <!-- タイマー タブ -->
+        <div id="timer-tab" class="tab-content active">
+            <div class="multi-timer-container">
+                <div class="accordion-card" id="add-timer-accordion">
+                    <button class="accordion-header" onclick="toggleAccordion()">
+                        <span>＋ 新しいタイマーを設定</span>
+                        <span class="accordion-icon">▼</span>
                     </button>
+                    <div class="accordion-body">
+                        <input type="text" id="new-timer-label" class="label-input" placeholder="タイマー名 (例: パスタ、筋トレ)">
 
-                    <div class="bell-settings-card">
-                        <div class="card-title">ベル鳴動設定</div>
-                        
-                        <div class="bell-row">
-                            <div class="bell-row-left">
-                                <span class="bell-tag">1回目 (予鈴)</span>
-                                <div class="bell-time-inputs">
-                                    <input type="number" id="bell1-min" class="mini-input" value="7" onchange="savePresenSettings()"> 分
-                                    <input type="number" id="bell1-sec" class="mini-input" value="0" onchange="savePresenSettings()"> 秒
+                        <div class="wheel-picker-wrapper">
+                            <div class="wheel-selection-bar"></div>
+                            <div class="wheel-column-group">
+                                <div class="wheel-column">
+                                    <div class="wheel-container" id="wheel-hours">
+                                        <ul class="wheel-list"></ul>
+                                    </div>
+                                    <span class="wheel-unit">時間</span>
+                                </div>
+                                <div class="wheel-column">
+                                    <div class="wheel-container" id="wheel-minutes">
+                                        <ul class="wheel-list"></ul>
+                                    </div>
+                                    <span class="wheel-unit">分</span>
+                                </div>
+                                <div class="wheel-column">
+                                    <div class="wheel-container" id="wheel-seconds">
+                                        <ul class="wheel-list"></ul>
+                                    </div>
+                                    <span class="wheel-unit">秒</span>
                                 </div>
                             </div>
-                            <span style="font-size: 12px; color: #4CAF50;">1回 (チーン)</span>
                         </div>
 
-                        <div class="bell-row">
-                            <div class="bell-row-left">
-                                <span class="bell-tag">2回目 (終了)</span>
-                                <div class="bell-time-inputs">
-                                    <input type="number" id="bell2-min" class="mini-input" value="10" onchange="savePresenSettings()"> 分
-                                    <input type="number" id="bell2-sec" class="mini-input" value="0" onchange="savePresenSettings()"> 秒
-                                </div>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" id="bell2-enable" checked onchange="savePresenSettings()">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
+                        <button class="add-btn" onclick="addNewTimer()">タイマーを追加</button>
+                    </div>
+                </div>
 
-                        <div class="bell-row">
-                            <div class="bell-row-left">
-                                <span class="bell-tag">3回目 (質疑)</span>
-                                <div class="bell-time-inputs">
-                                    <input type="number" id="bell3-min" class="mini-input" value="15" onchange="savePresenSettings()"> 分
-                                    <input type="number" id="bell3-sec" class="mini-input" value="0" onchange="savePresenSettings()"> 秒
-                                </div>
+                <div id="timers-list" class="timers-list"></div>
+            </div>
+        </div>
+
+        <!-- プレゼンベル タブ -->
+        <div id="presen-tab" class="tab-content">
+            <div class="presen-container">
+                <div class="presen-timer-card">
+                    <div style="font-size: 12px; color: #888;">経過時間</div>
+                    <div id="presen-display" class="presen-time-display">00:00</div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                        <button id="presen-start-btn" class="add-btn" style="background-color: #2E7D32; color: #FFF; padding: 10px 24px;" onclick="togglePresenTimer()">スタート</button>
+                        <button class="add-btn" style="background-color: #333; color: #AAA; padding: 10px 24px;" onclick="resetPresenTimer()">リセット</button>
+                    </div>
+                </div>
+
+                <button class="manual-bell-btn" onclick="playRingBell(1)">
+                    🔔 手動でベルを鳴らす (チーン)
+                </button>
+
+                <div class="bell-settings-card">
+                    <div class="card-title">ベル鳴動設定</div>
+                    
+                    <div class="bell-row">
+                        <div class="bell-row-left">
+                            <span class="bell-tag">1回目 (予鈴)</span>
+                            <div class="bell-time-inputs">
+                                <input type="number" id="bell1-min" class="mini-input" value="7" onchange="savePresenSettings()"> 分
+                                <input type="number" id="bell1-sec" class="mini-input" value="0" onchange="savePresenSettings()"> 秒
                             </div>
-                            <label class="switch">
-                                <input type="checkbox" id="bell3-enable" checked onchange="savePresenSettings()">
-                                <span class="slider"></span>
-                            </label>
                         </div>
+                        <span style="font-size: 12px; color: #4CAF50;">1回 (チーン)</span>
+                    </div>
+
+                    <div class="bell-row">
+                        <div class="bell-row-left">
+                            <span class="bell-tag">2回目 (終了)</span>
+                            <div class="bell-time-inputs">
+                                <input type="number" id="bell2-min" class="mini-input" value="10" onchange="savePresenSettings()"> 分
+                                <input type="number" id="bell2-sec" class="mini-input" value="0" onchange="savePresenSettings()"> 秒
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="bell2-enable" checked onchange="savePresenSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="bell-row">
+                        <div class="bell-row-left">
+                            <span class="bell-tag">3回目 (質疑)</span>
+                            <div class="bell-time-inputs">
+                                <input type="number" id="bell3-min" class="mini-input" value="15" onchange="savePresenSettings()"> 分
+                                <input type="number" id="bell3-sec" class="mini-input" value="0" onchange="savePresenSettings()"> 秒
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="bell3-enable" checked onchange="savePresenSettings()">
+                            <span class="slider"></span>
+                        </label>
                     </div>
                 </div>
             </div>
-
-            <footer class="tool-footer">
-                <a href="http://mrs-tools.pages.dev" target="_blank" rel="noopener noreferrer">MRS TOOLS</a>
-            </footer>
-
-        </main>
-    </div>
+        </div>
+    </main>
 
     <!-- ========================================
          固定広告
