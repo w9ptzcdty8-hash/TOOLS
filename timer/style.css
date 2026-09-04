@@ -1,0 +1,526 @@
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #000000;
+            color: #E0E0E0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        input[type="text"], input[type="number"] {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        header {
+            background-color: #121212;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: #FF9800;
+            border-bottom-color: #FF9800;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .tab-content {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+            padding: 15px;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .multi-timer-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .accordion-card {
+            background-color: #121212;
+            border-radius: 16px;
+            border: 1px solid #222;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-header {
+            width: 100%;
+            padding: 16px;
+            background-color: #1A1A1A;
+            color: #FF9800;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .accordion-icon {
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-card.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease-out, padding 0.35s ease-out;
+            padding: 0 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .accordion-card.open .accordion-body {
+            max-height: 380px;
+            padding: 15px;
+        }
+
+        .label-input {
+            width: 100%;
+            padding: 10px;
+            background-color: #1E1E1E;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #FFF;
+            font-size: 14px;
+        }
+
+        .label-input:focus {
+            outline: none;
+            border-color: #FF9800;
+        }
+
+        .wheel-picker-wrapper {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .wheel-selection-bar {
+            position: absolute;
+            top: 50%;
+            left: 8px;
+            right: 8px;
+            height: 40px;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .wheel-column-group {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            justify-content: space-evenly;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .wheel-column {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .wheel-container {
+            width: 55px;
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .wheel-list {
+            position: absolute;
+            width: 100%;
+            top: 60px;
+            left: 0;
+            list-style: none;
+        }
+
+        .wheel-item {
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 300;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .wheel-item.selected {
+            color: #FFF;
+            font-weight: bold;
+            font-size: 25px;
+        }
+
+        .wheel-unit {
+            font-size: 13px;
+            color: #FFF;
+            font-weight: bold;
+            margin-left: 2px;
+            pointer-events: none;
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #FF9800;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .add-btn:active {
+            opacity: 0.8;
+        }
+
+        .timers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .timer-card {
+            background-color: #121212;
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .timer-card-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-circle-wrapper {
+            position: relative;
+            width: 65px;
+            height: 65px;
+        }
+
+        .progress-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: #222;
+            stroke-width: 6;
+        }
+
+        .circle-bar {
+            fill: none;
+            stroke: #FF9800;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 188;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0.2s linear;
+        }
+
+        .timer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timer-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #AAA;
+        }
+
+        .timer-time-text {
+            font-size: 26px;
+            font-weight: 300;
+            font-variant-numeric: tabular-nums;
+            color: #FFF;
+        }
+
+        .timer-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sm-circle-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFF;
+        }
+
+        .btn-start { background-color: #2E7D32; color: #81C784; }
+        .btn-pause { background-color: #E65100; color: #FFB74D; }
+        .btn-reset { background-color: #222; color: #AAA; }
+        .btn-delete { background-color: transparent; color: #E57373; font-size: 16px; border: 1px solid #333; width: 30px; height: 30px; }
+
+        .presen-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .presen-timer-card {
+            background-color: #121212;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #222;
+        }
+
+        .presen-time-display {
+            font-size: 52px;
+            font-weight: bold;
+            color: #FFF;
+            font-variant-numeric: tabular-nums;
+            margin: 10px 0;
+        }
+
+        .bell-settings-card {
+            background-color: #121212;
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid #222;
+        }
+
+        .card-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 6px;
+        }
+
+        .bell-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .bell-row-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bell-tag {
+            background-color: #222;
+            color: #FFB74D;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 75px;
+            text-align: center;
+        }
+
+        .bell-time-inputs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mini-input {
+            width: 45px;
+            padding: 6px;
+            background-color: #1E1E1E;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #FFF;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333;
+            transition: .2s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: #4CAF50; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .manual-bell-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: #D84315;
+            color: #FFF;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(216, 67, 21, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .manual-bell-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .empty-msg {
+            text-align: center;
+            color: #555;
+            padding: 30px 0;
+            font-size: 14px;
+        }
+
+        /* MRS TOOLS リンク（追加分のみ） */
+        .footer-link-container {
+            width: 100%;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .btn-footer-link {
+            display: inline-block;
+            color: #888888;
+            font-size: 0.85rem;
+            font-weight: normal;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            border-radius: 0;
+            min-height: auto;
+            padding: 4px 8px;
+            transition: color 0.2s;
+        }
+
+        .btn-footer-link:active,
+        .btn-footer-link:hover {
+            color: #cccccc;
+            background-color: transparent;
+            transform: none;
+        }
+
+
+/* Added for advertisement and bell-count alignment; existing visual design is unchanged. */
+.ad-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #121212;
+    z-index: 1000;
+    padding-top: 1px;
+    padding-bottom: calc(1px + env(safe-area-inset-bottom));
+    border-top: 1px solid #333;
+}
+
+.bell-count {
+    width: 28px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 12px;
+    color: #4CAF50;
+}
