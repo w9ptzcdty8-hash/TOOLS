@@ -586,6 +586,8 @@ button {
   transform: translateX(-50%);
   width: min(480px, 100%);
   z-index: 1001;
+  display: flex;
+  flex-direction: row;
 }
 
 .tab-btn {
