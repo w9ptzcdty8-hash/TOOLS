@@ -524,3 +524,13 @@
     font-size: 12px;
     color: #4CAF50;
 }
+
+
+/* Align the 1回 label with the 2回/3回 labels by reserving the switch space. */
+.switch-placeholder {
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+    visibility: hidden;
+}
