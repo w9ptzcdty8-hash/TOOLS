@@ -288,3 +288,13 @@ textarea:focus {
     padding-bottom: calc(1px + env(safe-area-inset-bottom));
     border-top: 1px solid #333;
  }
+
+
+/* MRS TOOLS link */
+.mrs-tools-link {
+    display: inline-block;
+    color: #888888;
+    font-size: 0.85rem;
+    text-decoration: underline;
+    padding: 4px 8px;
+}
