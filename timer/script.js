@@ -15,31 +15,20 @@ let audioCtx = null;
             for (let i = 0; i < count; i++) {
                 setTimeout(() => {
                     const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
 
-                    // 金属製ベルらしい音：基音＋複数の高次倍音を短く減衰させる
-                    const partials = [
-                        { frequency: 880, gain: 0.45 },
-                        { frequency: 1760, gain: 0.28 },
-                        { frequency: 2640, gain: 0.18 },
-                        { frequency: 3520, gain: 0.10 }
-                    ];
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(2400, now);
 
-                    partials.forEach(partial => {
-                        const osc = audioCtx.createOscillator();
-                        const gain = audioCtx.createGain();
+                    gain.gain.setValueAtTime(0.8, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
 
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(partial.frequency, now);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
 
-                        gain.gain.setValueAtTime(partial.gain, now);
-                        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
-
-                        osc.connect(gain);
-                        gain.connect(audioCtx.destination);
-
-                        osc.start(now);
-                        osc.stop(now + 1.8);
-                    });
+                    osc.start(now);
+                    osc.stop(now + 1.8);
                 }, i * 500);
             }
         }
