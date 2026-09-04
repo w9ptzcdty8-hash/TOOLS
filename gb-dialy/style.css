@@ -683,3 +683,27 @@ button {
   from { opacity: 0; transform: translate(-50%, 8px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
+
+
+/* MRS TOOLS link and fixed ad */
+.mrs-tools-link-wrap {
+  text-align: center;
+  padding: 6px 0 2px;
+}
+.mrs-tools-link {
+  color: #888;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+.ad-banner {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  background: #fff;
+  padding-bottom: env(safe-area-inset-bottom);
+}
