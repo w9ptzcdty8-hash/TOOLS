@@ -406,3 +406,35 @@ main {
     padding-bottom: calc(1px + env(safe-area-inset-bottom));
     border-top: 1px solid #333;
 }
+
+/* ========================================
+   Footer Link (MRS TOOLS)
+======================================== */
+
+.footer-link-container {
+    width: 100%;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.btn-footer-link {
+    display: inline-block;
+    color: #888888;
+    font-size: 0.85rem;
+    font-weight: normal;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    border-radius: 0;
+    min-height: auto;
+    padding: 4px 8px;
+    transition: color 0.2s;
+}
+
+.btn-footer-link:active,
+.btn-footer-link:hover {
+    color: #cccccc;
+    background-color: transparent;
+    transform: none;
+}
