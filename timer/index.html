@@ -477,6 +477,35 @@
             padding: 30px 0;
             font-size: 14px;
         }
+
+        /* MRS TOOLS リンク（追加分のみ） */
+        .footer-link-container {
+            width: 100%;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .btn-footer-link {
+            display: inline-block;
+            color: #888888;
+            font-size: 0.85rem;
+            font-weight: normal;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            border-radius: 0;
+            min-height: auto;
+            padding: 4px 8px;
+            transition: color 0.2s;
+        }
+
+        .btn-footer-link:active,
+        .btn-footer-link:hover {
+            color: #cccccc;
+            background-color: transparent;
+            transform: none;
+        }
     </style>
 </head>
 <body>
@@ -526,6 +555,11 @@
                 </div>
 
                 <div id="timers-list" class="timers-list"></div>
+
+                <!-- MRS TOOLS リンクエリア -->
+                <div class="footer-link-container">
+                    <a href="https://mrs-tools.pages.dev" target="_blank" rel="noopener noreferrer" class="btn-footer-link">MRS TOOLS</a>
+                </div>
             </div>
         </div>
 
@@ -534,7 +568,7 @@
                 <div class="presen-timer-card">
                     <div style="font-size: 12px; color: #888;">経過時間</div>
                     <div id="presen-display" class="presen-time-display">00:00</div>
-                    
+
                     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
                         <button id="presen-start-btn" class="add-btn" style="background-color: #2E7D32; color: #FFF; padding: 10px 24px;" onclick="togglePresenTimer()">スタート</button>
                         <button class="add-btn" style="background-color: #333; color: #AAA; padding: 10px 24px;" onclick="resetPresenTimer()">リセット</button>
@@ -547,7 +581,7 @@
 
                 <div class="bell-settings-card">
                     <div class="card-title">ベル鳴動設定</div>
-                    
+
                     <div class="bell-row">
                         <div class="bell-row-left">
                             <span class="bell-tag">1回目 (予鈴)</span>
@@ -586,6 +620,11 @@
                             <span class="slider"></span>
                         </label>
                     </div>
+                </div>
+
+                <!-- MRS TOOLS リンクエリア -->
+                <div class="footer-link-container">
+                    <a href="https://mrs-tools.pages.dev" target="_blank" rel="noopener noreferrer" class="btn-footer-link">MRS TOOLS</a>
                 </div>
             </div>
         </div>
@@ -629,29 +668,23 @@
 
         function playAlarmSound() {
             initAudio();
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            const now = audioCtx.currentTime;
 
-            for (let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    const now = audioCtx.currentTime;
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
 
-                    osc.type = 'square';
-                    osc.frequency.setValueAtTime(880, now);
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(880, now);
+            osc.frequency.setValueAtTime(440, now + 0.15);
 
-                    gain.gain.setValueAtTime(0.3, now);
-                    gain.gain.setValueAtTime(0, now + 0.1);
+            gain.gain.setValueAtTime(0.5, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
 
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
 
-                    osc.start(now);
-                    osc.stop(now + 0.1);
-                }, i * 150);
-            }
+            osc.start(now);
+            osc.stop(now + 0.8);
         }
 
         function switchTab(tabName) {
@@ -685,7 +718,7 @@
                 this.currentY = 0;
                 this.startY = 0;
                 this.isDragging = false;
-                
+
                 this.lastY = 0;
                 this.lastTime = 0;
                 this.velocity = 0;
@@ -700,13 +733,13 @@
                     const li = document.createElement('li');
                     li.className = 'wheel-item';
                     li.textContent = i;
-                    
+
                     // クリック/タップで数字の直接指定・入力（確実に反応するようpointerupまたはclickに設定）
                     li.addEventListener('click', (e) => {
                         e.stopPropagation();
                         this.promptDirectInput(i);
                     });
-                    
+
                     this.list.appendChild(li);
                 }
 
@@ -788,7 +821,7 @@
             snapToNearest() {
                 const minY = -(this.max - this.min) * this.itemHeight;
                 const maxY = 0;
-                
+
                 let targetY = this.currentY;
                 if (targetY > maxY) targetY = maxY;
                 if (targetY < minY) targetY = minY;
@@ -853,7 +886,7 @@
                             id: t.id,
                             label: t.label,
                             totalSec: t.totalSec,
-                            remainingSec: t.totalSec, // 再読み込み時は初期設定値にリセット、または一時停止状態として復元
+                            remainingSec: t.totalSec,
                             isRunning: false,
                             intervalId: null
                         }));
@@ -976,7 +1009,7 @@
 
                 target.intervalId = setInterval(() => {
                     target.remainingSec--;
-                    
+
                     if (target.remainingSec <= 0) {
                         clearInterval(target.intervalId);
                         target.isRunning = false;
@@ -1132,4 +1165,3 @@
     </script>
 </body>
 </html>
-
