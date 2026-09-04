@@ -580,8 +580,12 @@ button {
 
 /* ---------- タブバー ---------- */
 .tab-bar {
-  position: sticky;
-  bottom: 0;
+  position: fixed;
+  left: 50%;
+  bottom: 90px;
+  transform: translateX(-50%);
+  width: min(480px, 100%);
+  z-index: 1001;
   display: flex;
   background: var(--surface);
   border-top: 1px solid var(--border);
@@ -709,7 +713,9 @@ button {
 }
 
 
-/* Reserve space for the fixed advertisement so the tab bar is never covered. */
-.app {
-  padding-bottom: 90px;
+
+
+/* Keep content clear of the fixed tab bar and advertisement. */
+.tab-content {
+  padding-bottom: 190px;
 }
