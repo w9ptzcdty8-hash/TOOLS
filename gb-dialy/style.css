@@ -707,3 +707,9 @@ button {
   background: #fff;
   padding-bottom: env(safe-area-inset-bottom);
 }
+
+
+/* Reserve space for the fixed advertisement so the tab bar is never covered. */
+.app {
+  padding-bottom: 90px;
+}
