@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>MRS WORKS</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main id="app">
+
+        <!-- ========================================
+             ヘッダー（タブ + 設定ボタン）
+        ========================================= -->
+        <header class="topbar">
+            <nav class="tabs" role="tablist">
+                <button class="tab-btn is-active" data-tab="dice" role="tab" aria-selected="true">DICE</button>
+                <button class="tab-btn" data-tab="coin" role="tab" aria-selected="false">COIN</button>
+            </nav>
+            <button class="settings-btn" id="settingsBtn" aria-label="設定を開く">
+                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                    <path fill="currentColor" d="M19.14 12.94a7.14 7.14 0 0 0 .06-.94 7.14 7.14 0 0 0-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54a7.3 7.3 0 0 0-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.14 7.14 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.3.6.22l2.39-.96c.5.4 1.04.71 1.63.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.23 1.13-.54 1.63-.94l2.39.96c.21.08.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64ZM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5Z"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- ========================================
+             DICE パネル
+        ========================================= -->
+        <section class="panel is-active" data-panel="dice">
+
+            <div class="stage-area" id="diceStage" aria-live="polite"></div>
+
+            <div class="result-area" id="diceResultArea">
+                <p class="result-hint">ROLLを押してください</p>
+            </div>
+
+            <button class="action-btn" id="rollBtn" aria-label="ダイスを振る">ROLL</button>
+
+            <div class="history-section">
+                <div class="history-header">
+                    <h2>履歴</h2>
+                    <button class="clear-btn" data-clear="dice" aria-label="履歴をすべて削除">全削除</button>
+                </div>
+                <ul class="history-list" id="diceHistoryList">
+                    <li class="history-empty">まだ履歴がありません</li>
+                </ul>
+            </div>
+
+        </section>
+
+        <!-- ========================================
+             COIN パネル
+        ========================================= -->
+        <section class="panel" data-panel="coin">
+
+            <div class="stage-area" id="coinStage" aria-live="polite"></div>
+
+            <div class="result-area" id="coinResultArea">
+                <p class="result-hint">TOSSを押してください</p>
+            </div>
+
+            <button class="action-btn" id="tossBtn" aria-label="コインを投げる">TOSS</button>
+
+            <div class="history-section">
+                <div class="history-header">
+                    <h2>履歴</h2>
+                    <button class="clear-btn" data-clear="coin" aria-label="履歴をすべて削除">全削除</button>
+                </div>
+                <ul class="history-list" id="coinHistoryList">
+                    <li class="history-empty">まだ履歴がありません</li>
+                </ul>
+            </div>
+
+        </section>
+
+
+        <!-- MRS TOOLS リンク -->
+        <p class="tools-footer-link">
+            <a href="https://mrs-tools.pages.dev/" target="_blank" rel="noopener noreferrer">MRS TOOLS</a>
+        </p>
+
+    </main>
+
+    <!-- ========================================
+         設定モーダル
+    ========================================= -->
+    <div class="modal-overlay" id="settingsModal" hidden>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+
+            <div class="modal-body" data-settings="dice">
+                <h2 id="settingsTitle">DICE設定</h2>
+
+                <div class="setting-row">
+                    <span class="setting-label">ダイスの個数</span>
+                    <div class="stepper">
+                        <button class="stepper-btn" data-step="dec" data-target="diceCount" aria-label="個数を減らす">−</button>
+                        <span class="stepper-value" id="diceCountValue">1</span>
+                        <button class="stepper-btn" data-step="inc" data-target="diceCount" aria-label="個数を増やす">＋</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-body" data-settings="coin" hidden>
+                <h2>COIN設定</h2>
+
+                <div class="setting-row">
+                    <span class="setting-label">コインの個数</span>
+                    <div class="stepper">
+                        <button class="stepper-btn" data-step="dec" data-target="coinCount" aria-label="個数を減らす">−</button>
+                        <span class="stepper-value" id="coinCountValue">1</span>
+                        <button class="stepper-btn" data-step="inc" data-target="coinCount" aria-label="個数を増やす">＋</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn--cancel" id="settingsCancelBtn">キャンセル</button>
+                <button class="modal-btn modal-btn--confirm" id="settingsConfirmBtn">完了</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================
+         履歴削除の確認ダイアログ
+    ========================================= -->
+    <div class="modal-overlay" id="confirmDialog" hidden>
+        <div class="modal modal--small" role="dialog" aria-modal="true">
+            <p class="confirm-text">履歴をすべて削除しますか？</p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn--cancel" id="confirmCancelBtn">キャンセル</button>
+                <button class="modal-btn modal-btn--danger" id="confirmDeleteBtn">削除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         固定広告
+    ========================================= -->
+
+    <div class="ad-banner">
+
+        <div style="max-width: 100%;">
+
+            <!-- admax -->
+            <script src="https://adm.shinobi.jp/s/8a495d941206bf0c34aff9559f8d2cea"></script>
+            <!-- admax -->
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
