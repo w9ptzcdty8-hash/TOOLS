@@ -718,11 +718,9 @@ button {
   align-items: flex-start;
   z-index: 1000;
   background: #fff;
-  padding: 0;
+  padding-top: 1px;
+  padding-bottom: calc(1px + env(safe-area-inset-bottom));
 }
-
-
-
 
 /* Keep content clear of the fixed tab bar and advertisement. */
 .tab-content {
